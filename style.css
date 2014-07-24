@@ -1,0 +1,15 @@
+input.small {
+	width: 33px;
+}
+
+label {
+	width: 40px;
+	display: inline-block;
+	text-align: right;
+}
+
+#basestats {
+	list-style-type: none;
+	padding-left: 0;
+	width: 150px;
+}

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Lewt Job Generator</title>
+	<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<input id="fileupload" type="file"> <select name="job" data-bind="
+								  value: job,
+								  options: jobList,
+								  optionsText: 'name',
+								  optionsValue: 'id'"></select>
+
+<h1 data-bind="text: name"></h1>
+
+<ul data-bind="sortable: statPriority">
+	<li data-bind="text: $parent.getStatById($data).longname"></li>
+</ul>
+<select data-bind="	value: selectedNewStat,
+					options: baseStats,
+					optionsText: 'longname',
+					optionsValue: 'id'
+"></select> <button data-bind="click: addPriority"></button>
+
+<script src="js/knockout.js"></script>
+<script src="js/jquery.js"></script>
+<script src="js/jquery-ui.min.js"></script>
+<script src="js/knockout-sortable.js"></script>
+<script src="js/underscore.js"></script>
+<script src='js/sql.js'></script>
+<script src='js/job.js'></script>
+
+</body>
+</html>
