@@ -1,3 +1,4 @@
+define([], function(){
 // This prevents pollution of the global namespace
 var SQL = (function () {
 function f(a){throw a;}var i=void 0,j=!0,k=null,m=!1;function n(){return function(){}}var q,r;r||(r=eval("(function() { try { return Module || {} } catch(e) { return {} } })()"));var aa={},ba;for(ba in r)r.hasOwnProperty(ba)&&(aa[ba]=r[ba]);var ca="object"===typeof process&&"function"===typeof require,da="object"===typeof window,ea="function"===typeof importScripts,fa=!da&&!ca&&!ea;
@@ -453,3 +454,6 @@ Z.sg=3;Z.he=4;Z.je=5;Z.jg=6;Z.ng=7;Z.vg=8;Z.hg=9;Z.ig=10;Z.me=11;Z.pg=12;Z.fg=13
 return this['SQL'];
 })();
 if (typeof module !== 'undefined') module.exports = SQL;
+
+return SQL;
+})

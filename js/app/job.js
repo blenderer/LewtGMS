@@ -1,12 +1,14 @@
-require({
-    //Set config for finding 'jqueryui'. The path is relative
-    //to the location of require-jquery.js.
-    paths: {
-        jqueryui: 'jquery-ui.min'
-    }
-}, ['require', 'jquery', 'jqueryui'], function (req, $) {
+require([
+	'jquery',
+	'jquery.ui.sortable',
+	'sql',
+	'knockout',
+	'kosortable',
+	'underscore'
+	], function ($, jui, SQL, ko, kosort, _) {
 
 	$(function() {
+
 		jobList = [];
 		statList = [];
 		$("#fileupload").change(function() {
