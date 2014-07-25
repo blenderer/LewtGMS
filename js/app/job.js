@@ -12,6 +12,7 @@ require([
 		jobList = [];
 		statList = [];
 		$("#fileupload").change(function() {
+			$("form").show();
 			var f = $(this).prop("files")[0];
 		    var r = new FileReader();
 		    r.onload = function() {
@@ -46,14 +47,36 @@ require([
 		var FormViewModel = function() {
 			self = this;
 
+			self.ready = ko.observable(true);
+
 			self.jobList = ko.observableArray(jobList);
 			self.statList = ko.observableArray(statList);
 
 			self.job = ko.observable(null);
+			self.name = ko.observable("");
 
-			self.getJob = function() {
+			self.getJob = ko.computed(function() {
 				return _.find(self.jobList(), function(item) { return item.id == self.job()})
-			};
+			});
+
+			self.hitdie = ko.observable();
+			self.statPriority = ko.observableArray();
+
+			self.job.subscribe(function(newValue) {
+				if (!self.job()) {
+					return false;
+				}
+				var thisJob = self.getJob();
+
+				self.hitdie(thisJob.hitdie);
+				self.statPriority(
+					_.map(thisJob.statpriority, function(item) {
+						return self.getStatById(item).longname
+					})
+				);
+			});
+
+			
 
 			self.getStatById = function(id) {
 				if (!_.findWhere(self.statList(), {id: id*1}))
@@ -67,31 +90,14 @@ require([
 				return _.where(self.statList(), {basestat: 1})
 			});
 
-			self.name = ko.computed(function() {
-				if (!self.job()) {
-					return "";
-				}
-				return self.getJob().name
-			});
-
-			self.hitdie = ko.computed(function() {
-				if (!self.job()) {
-					return "";
-				}
-				return self.getJob().hitdie
-			});
-
-			self.statPriority = ko.computed(function() {
-				if (!self.job()) {
-					return [];
-				}
-				return self.getJob().statpriority;
-			});
-
 			self.selectedNewStat = ko.observable();
 
 			self.addPriority = function() {
 				self.statPriority().push(self.selectedNewStat());
+			}
+
+			self.removeStat = function(stat) {
+				self.statPriority.remove(stat)
 			}
 		};
 	});
