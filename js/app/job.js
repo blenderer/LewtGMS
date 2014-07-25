@@ -93,7 +93,12 @@ require([
 			self.selectedNewStat = ko.observable();
 
 			self.addPriority = function() {
-				self.statPriority().push(self.selectedNewStat());
+				if (!_.contains(self.statPriority(), self.selectedNewStat())) {
+					self.statPriority.push(self.selectedNewStat());
+				}
+				else {
+					alert("Stat Priority already contains that stat!");
+				}
 			}
 
 			self.removeStat = function(stat) {
