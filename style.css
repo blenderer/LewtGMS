@@ -7,9 +7,7 @@ form {
 }
 
 label {
-	width: 40px;
-	display: inline-block;
-	text-align: right;
+	margin-right: 1.4em;
 }
 
 #basestats {
@@ -19,7 +17,7 @@ label {
 }
 
 span.deletestat {
-margin-left: 1.4em;
-color: red;
-cursor: pointer;
+	margin-left: 1.4em;
+	color: red;
+	cursor: pointer;
 }
