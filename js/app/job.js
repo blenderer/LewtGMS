@@ -94,11 +94,11 @@ require([
 				);
 
 				var deepProps = self.JobProps(self);
-				self.vanillaVM = jQuery.extend(true, {}, deepProps);
+				self.vanillaVM = JSON.stringify(deepProps);
 			});
 
 			self.isDirty = function() {
-				return JSON.stringify(self.JobProps(self)) != JSON.stringify(self.vanillaVM);
+				return JSON.stringify(self.JobProps(self)) != self.vanillaVM;
 			};
 
 			self.getStatById = function(id) {
@@ -125,7 +125,7 @@ require([
 			}
 
 			self.resetJob = function() {
-				_.each(self.vanillaVM, function(value, key) {
+				_.each(JSON.parse(self.vanillaVM), function(value, key) {
 					self[key](value);
 				});
 			}
