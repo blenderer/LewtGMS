@@ -54,6 +54,7 @@ require([
 
 			self.job = ko.observable(null);
 			self.name = ko.observable("");
+			self.id = ko.observable(null);
 
 			self.getJob = ko.computed(function() {
 				return _.find(self.jobList(), function(item) { return item.id == self.job()})
@@ -75,8 +76,12 @@ require([
 				}
 			}
 
-			self.JobProps = function(aViewModel) {
-				return _.pick(ko.toJS(aViewModel), "hitdie", "name", "statPriority");
+			self.jobProps = function() {
+				return _.pick(ko.toJS(self), 
+					"hitdie", 
+					"name", 
+					"statPriority",
+					"id");
 			};
 
 			self.job.subscribe(function(newValue) {
@@ -87,18 +92,20 @@ require([
 				var thisJob = self.getJob();
 
 				self.hitdie(thisJob.hitdie);
+				self.name(thisJob.name);
+				self.id(thisJob.id);
 				self.statPriority(
 					_.map(thisJob.statpriority, function(item) {
 						return self.getStatById(item).longname;
 					})
 				);
 
-				var deepProps = self.JobProps(self);
+				var deepProps = self.jobProps();
 				self.vanillaVM = JSON.stringify(deepProps);
 			});
 
 			self.isDirty = function() {
-				return JSON.stringify(self.JobProps(self)) != self.vanillaVM;
+				return JSON.stringify(self.jobProps()) != self.vanillaVM;
 			};
 
 			self.getStatById = function(id) {
@@ -107,6 +114,14 @@ require([
 					return false;
 				}
 				return _.findWhere(self.statList(), {id: id*1});
+			};
+
+			self.getStatIdByLongname = function(longname) {
+				if (!_.findWhere(self.statList(), {longname: longname}))
+				{
+					return false;
+				}
+				return _.findWhere(self.statList(), {longname: longname}).id;
 			};
 
 			self.baseStats = ko.computed(function() {
@@ -120,6 +135,19 @@ require([
 			self.saveLink = ko.observable("");
 
 			self.saveJob = function() {
+				var props = self.jobProps();
+				var idstatp = _.map(props.statPriority, function(longname) {
+							return self.getStatIdByLongname(longname);
+						}).join();
+
+				var sql = "INSERT OR REPLACE INTO Jobs" +
+				"(id, name, hitdie, statpriority)" +
+				"VALUES ('"+props.id+"', '"+props.name+"', '"+props.hitdie+"', '"+idstatp+"')";
+
+				
+
+				db.run(sql);
+
 				var blob = new Blob([db.export()], {type: "application/octet-stream"});
 	        	self.saveLink(window.URL.createObjectURL(blob));
 			}
