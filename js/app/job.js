@@ -12,7 +12,7 @@ require([
 		jobList = [];
 		statList = [];
 		$("#fileupload").change(function() {
-			$("form").show();
+			$("#form").show();
 			var f = $(this).prop("files")[0];
 		    var r = new FileReader();
 		    r.onload = function() {
@@ -44,27 +44,6 @@ require([
 		    r.readAsArrayBuffer(f);
 		});
 
-		$("#filesave").click(function() {
-
-			var binArray = db.export();
-
-			var saveData = (function () {
-			    var a = document.createElement("a");
-			    document.body.appendChild(a);
-			    a.style = "display: none";
-			    return function (data, fileName) {
-			        var blob = new Blob([data], {type: "application/octet-stream"}),
-			            url = window.URL.createObjectURL(blob);
-			        a.href = url;
-			        a.download = fileName;
-			        a.click();
-			        window.URL.revokeObjectURL(url);
-			    };
-			}());
-
-			saveData(binArray, "fileName");
-		})
-
 		var FormViewModel = function() {
 			self = this;
 
@@ -83,33 +62,7 @@ require([
 			self.hitdie = ko.observable();
 			self.statPriority = ko.observableArray();
 
-			self.job.subscribe(function(newValue) {
-				if (!self.job()) {
-					return false;
-				}
-				var thisJob = self.getJob();
-
-				self.hitdie(thisJob.hitdie);
-				self.statPriority(
-					_.map(thisJob.statpriority, function(item) {
-						return self.getStatById(item).longname
-					})
-				);
-			});
-
-			
-
-			self.getStatById = function(id) {
-				if (!_.findWhere(self.statList(), {id: id*1}))
-				{
-					return false;
-				}
-				return _.findWhere(self.statList(), {id: id*1});
-			}
-
-			self.baseStats = ko.computed(function() {
-				return _.where(self.statList(), {basestat: 1})
-			});
+			self.vanillaVM = null;
 
 			self.selectedNewStat = ko.observable();
 
@@ -122,8 +75,59 @@ require([
 				}
 			}
 
+			self.JobProps = function(aViewModel) {
+				return _.pick(ko.toJS(aViewModel), "hitdie", "name", "statPriority");
+			};
+
+			self.job.subscribe(function(newValue) {
+				if (!self.job()) {
+					return false;
+				}
+
+				var thisJob = self.getJob();
+
+				self.hitdie(thisJob.hitdie);
+				self.statPriority(
+					_.map(thisJob.statpriority, function(item) {
+						return self.getStatById(item).longname;
+					})
+				);
+
+				var deepProps = self.JobProps(self);
+				self.vanillaVM = jQuery.extend(true, {}, deepProps);
+			});
+
+			self.isDirty = function() {
+				return JSON.stringify(self.JobProps(self)) != JSON.stringify(self.vanillaVM);
+			};
+
+			self.getStatById = function(id) {
+				if (!_.findWhere(self.statList(), {id: id*1}))
+				{
+					return false;
+				}
+				return _.findWhere(self.statList(), {id: id*1});
+			};
+
+			self.baseStats = ko.computed(function() {
+				return _.where(self.statList(), {basestat: 1})
+			});
+
 			self.removeStat = function(stat) {
 				self.statPriority.remove(stat)
+			}
+
+			self.saveLink = ko.observable("");
+
+			self.saveJob = function() {
+				var blob = new Blob([db.export()], {type: "application/octet-stream"});
+	        	self.saveLink(window.URL.createObjectURL(blob));
+			}
+
+			self.resetJob = function() {
+				_.each(self.vanillaVM, function(value, key) {
+					self[key](value);
+				});
 			}
 		};
 	});

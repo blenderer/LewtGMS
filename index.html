@@ -7,9 +7,10 @@
 </head>
 <body>
 
-<input id="fileupload" type="file"><button id="filesave">Save DB</button>
+<input id="fileupload" type="file">
+<a data-bind="visible: saveLink, attr: {href: saveLink, download: 'db.sql'}">Export DB</a>
 
-<form>
+<div id="form">
 <select name="job" data-bind="
 					value: job,
 					options: jobList,
@@ -34,7 +35,12 @@
 
 <label>Hitdie:</label><input data-bind="value: hitdie" class="small" type="text">
 
-</form>
+<div data-bind="visible: isDirty()">
+	<button data-bind="click: saveJob">Save Job</button>
+	<button data-bind="click: resetJob">Reset Job</button>
+</div>
+
+</div>
 
 <script data-main="js/app" src="js/lib/require.js"></script>
 
