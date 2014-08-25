@@ -60,10 +60,6 @@ require([
 				self.properties.statpriority.remove(stat);
 			}
 
-			self.isDirty = function() {
-				return JSON.stringify(ko.toJS(self.properties)) != self.clean;
-			};
-
 			self.resetJob = function() {
 				_.each(JSON.parse(self.clean), function(value, key) {
 					self.properties[key](value);
@@ -89,6 +85,11 @@ require([
 
 	        	self.changeJob();
 			}
+
+			self.isDirty = ko.computed(function() {
+				return JSON.stringify(ko.toJS(self.properties)) != self.clean;
+			}).extend({ rateLimit: 10 });
+
 
 			return self;
 		}
