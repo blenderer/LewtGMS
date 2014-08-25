@@ -8,10 +8,6 @@ require([
 	'underscore'
 	], function ($, jui, SQL, ko, komapping, kosort, _) {
 
-	$(function() {
-
-		viewModel = null;
-
 		$("#fileupload").change(function() {
 			$("#form").show();
 			var f = $(this).prop("files")[0];
@@ -27,12 +23,21 @@ require([
 		});
 
 		viewModel = function() {
+			var data = loadJob();
+
 			var options = {
-			    'copy': ["statlist"]
+			    'copy': [
+			    	"statlist",
+			    	"jobs.id",
+			    	"jobs.name",
+			    	"clean"
+			    ]
 			}
-			var self = komapping.fromJS(loadJob(), options);
+
+			self = komapping.fromJS(data, options);
 
 			self.selectedStat = ko.observable();
+			self.selectedJob = ko.observable();
 
 			self.baseStats = ko.observableArray(_.where(self.statlist, {basestat: 1}));
 
@@ -43,6 +48,46 @@ require([
 				else {
 					alert("Stat Priority already contains that stat!");
 				}
+			}
+
+			self.saveLink = ko.observable();
+
+			self.changeJob = function() {
+				komapping.fromJS(loadJob(self.selectedJob()), self)
+			}
+
+			self.removeStat = function(stat) {
+				self.properties.statpriority.remove(stat);
+			}
+
+			self.isDirty = function() {
+				return JSON.stringify(ko.toJS(self.properties)) != self.clean;
+			};
+
+			self.resetJob = function() {
+				_.each(JSON.parse(self.clean), function(value, key) {
+					self.properties[key](value);
+				});
+			}
+
+			self.saveJob = function() {
+				var props = ko.toJS(self.properties);
+				var idstatpriority = _.map(props.statpriority, function(longname) {
+							return _.findWhere(self.statlist, {longname: longname}).id;
+						}).join();
+
+				var sql = "INSERT OR REPLACE INTO Jobs" +
+				"(id, name, hitdie, statpriority)" +
+				"VALUES ('"+props.id+"', '"+props.name+"', '"+props.hitdie+"', '"+idstatpriority+"')";
+
+				
+
+				db.run(sql);
+
+				var blob = new Blob([db.export()], {type: "application/octet-stream"});
+	        	self.saveLink(window.URL.createObjectURL(blob));
+
+	        	self.changeJob();
 			}
 
 			return self;
@@ -92,118 +137,8 @@ require([
 		    return {
 		    	jobs: jobs,
 		    	properties: properties,
-		    	statlist: statList
+		    	statlist: statList,
+		    	clean: JSON.stringify(properties)
 		    };
 		}
-
-		/*var FormViewModel = function() {
-			self = this;
-
-			self.ready = ko.observable(true);
-
-			self.jobList = ko.observableArray(jobList);
-			self.statList = ko.observableArray(statList);
-
-			self.job = ko.observable(null);
-			self.name = ko.observable("");
-			self.id = ko.observable(null);
-
-			self.getJob = ko.computed(function() {
-				return _.find(self.jobList(), function(item) { return item.id == self.job()})
-			});
-
-			self.hitdie = ko.observable();
-			self.statPriority = ko.observableArray();
-
-			self.vanillaVM = null;
-
-			self.selectedNewStat = ko.observable();
-
-			self.jobProps = function() {
-				return _.pick(ko.toJS(self), 
-					"hitdie", 
-					"name", 
-					"statPriority",
-					"id");
-			};
-
-			self.job.subscribe(function(newValue) {
-				if (!self.job()) {
-					return false;
-				}
-
-				var thisJob = self.getJob();
-
-				self.hitdie(thisJob.hitdie);
-				self.name(thisJob.name);
-				self.id(thisJob.id);
-				self.statPriority(
-					_.map(thisJob.statpriority, function(item) {
-						return self.getStatById(item).longname;
-					})
-				);
-
-				var deepProps = self.jobProps();
-				self.vanillaVM = JSON.stringify(deepProps);
-			});
-
-			self.isDirty = function() {
-				return JSON.stringify(self.jobProps()) != self.vanillaVM;
-			};
-
-			self.getStatById = function(id) {
-				if (!_.findWhere(self.statList(), {id: id*1}))
-				{
-					return false;
-				}
-				return _.findWhere(self.statList(), {id: id*1});
-			};
-
-			self.getStatIdByLongname = function(longname) {
-				if (!_.findWhere(self.statList(), {longname: longname}))
-				{
-					return false;
-				}
-				return _.findWhere(self.statList(), {longname: longname}).id;
-			};
-
-			self.baseStats = ko.computed(function() {
-				return _.where(self.statList(), {basestat: 1})
-			});
-
-			self.removeStat = function(stat) {
-				self.statPriority.remove(stat)
-			}
-
-			self.saveLink = ko.observable("");
-
-			self.saveJob = function() {
-				var props = self.jobProps();
-				var idstatp = _.map(props.statPriority, function(longname) {
-							return self.getStatIdByLongname(longname);
-						}).join();
-
-				var sql = "INSERT OR REPLACE INTO Jobs" +
-				"(id, name, hitdie, statpriority)" +
-				"VALUES ('"+props.id+"', '"+props.name+"', '"+props.hitdie+"', '"+idstatp+"')";
-
-				
-
-				db.run(sql);
-
-				//self.jobList.removeAll();
-				//self.jobList.push(loadJobs());
-
-				var blob = new Blob([db.export()], {type: "application/octet-stream"});
-	        	self.saveLink(window.URL.createObjectURL(blob));
-			}
-
-			self.resetJob = function() {
-				_.each(JSON.parse(self.vanillaVM), function(value, key) {
-					self[key](value);
-				});
-			}
-		};*/
-	});
-
 });
