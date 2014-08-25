@@ -3,14 +3,15 @@ require([
 	'jquery.ui.sortable',
 	'sql',
 	'knockout',
+	'komapping',
 	'kosortable',
 	'underscore'
-	], function ($, jui, SQL, ko, kosort, _) {
+	], function ($, jui, SQL, ko, komapping, kosort, _) {
 
 	$(function() {
 
-		jobList = [];
-		statList = [];
+		viewModel = null;
+
 		$("#fileupload").change(function() {
 			$("#form").show();
 			var f = $(this).prop("files")[0];
@@ -19,32 +20,83 @@ require([
 		        var Uints = new Uint8Array(r.result);
 		        db = new SQL.Database(Uints);
 
-		        //LOAD JOBS
-		        var stmt = db.prepare("SELECT * FROM Jobs");
-				stmt.getAsObject();
-				
-				while(stmt.step()) { //
-			        var row = stmt.getAsObject();
-			        row.statpriority = row.statpriority.split(",");
-			        jobList.push(row);
-			    }
-
-			    //LOAD stats
-		        var stmt = db.prepare("SELECT * FROM stats_type");
-				stmt.getAsObject();
-				
-				while(stmt.step()) { //
-			        var row = stmt.getAsObject();
-			        statList[row.id] = row;
-			    }
-
-		        app = new FormViewModel();
-				ko.applyBindings(app);
+		        viewModel = viewModel();
+		        ko.applyBindings(viewModel);
 		    }
 		    r.readAsArrayBuffer(f);
 		});
 
-		var FormViewModel = function() {
+		viewModel = function() {
+			var options = {
+			    'copy': ["statlist"]
+			}
+			var self = komapping.fromJS(loadJob(), options);
+
+			self.selectedStat = ko.observable();
+
+			self.baseStats = ko.observableArray(_.where(self.statlist, {basestat: 1}));
+
+			self.addPriority = function() {
+				if (!_.contains(self.properties.statpriority(), self.selectedStat())) {
+					self.properties.statpriority.push(self.selectedStat());
+				}
+				else {
+					alert("Stat Priority already contains that stat!");
+				}
+			}
+
+			return self;
+		}
+
+		function loadJob(job) {
+			//LOAD JOB NAMES
+	        var stmt = db.prepare("SELECT id, name FROM Jobs");
+			stmt.getAsObject();
+
+			var jobs = [];
+			
+			while(stmt.step()) { //
+		        var row = stmt.getAsObject();
+		        jobs.push(row);
+		    }
+
+		    var jobId = job || jobs[0].id;
+
+		    //GET STAT NAMES
+		    var statList = [];
+
+	        var stmt = db.prepare("SELECT * FROM stats_type");
+			stmt.getAsObject();
+			
+			while(stmt.step()) { //
+		        var row = stmt.getAsObject();
+		        statList.push(row);
+		    }
+
+		    //LOAD JOB*
+	        var stmt = db.prepare("SELECT * FROM Jobs where id = '" + jobId + "'");
+			stmt.getAsObject();
+
+			var properties = [];
+			
+			while(stmt.step()) { //
+		        var row = stmt.getAsObject();
+		        row.statpriority = row.statpriority.split(",");
+		        properties = row;
+		    }
+
+		    for (var i=0; i<properties.statpriority.length; i++) {
+		    	properties.statpriority[i] = _.findWhere(statList, {id: properties.statpriority[i]*1}).longname;
+		    }
+
+		    return {
+		    	jobs: jobs,
+		    	properties: properties,
+		    	statlist: statList
+		    };
+		}
+
+		/*var FormViewModel = function() {
 			self = this;
 
 			self.ready = ko.observable(true);
@@ -66,15 +118,6 @@ require([
 			self.vanillaVM = null;
 
 			self.selectedNewStat = ko.observable();
-
-			self.addPriority = function() {
-				if (!_.contains(self.statPriority(), self.selectedNewStat())) {
-					self.statPriority.push(self.selectedNewStat());
-				}
-				else {
-					alert("Stat Priority already contains that stat!");
-				}
-			}
 
 			self.jobProps = function() {
 				return _.pick(ko.toJS(self), 
@@ -148,6 +191,9 @@ require([
 
 				db.run(sql);
 
+				//self.jobList.removeAll();
+				//self.jobList.push(loadJobs());
+
 				var blob = new Blob([db.export()], {type: "application/octet-stream"});
 	        	self.saveLink(window.URL.createObjectURL(blob));
 			}
@@ -157,7 +203,7 @@ require([
 					self[key](value);
 				});
 			}
-		};
+		};*/
 	});
 
 });

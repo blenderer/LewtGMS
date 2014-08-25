@@ -8,37 +8,38 @@
 <body>
 
 <input id="fileupload" type="file">
-<a data-bind="visible: saveLink, attr: {href: saveLink, download: 'db.sql'}">Export DB</a>
+<!--<a data-bind="visible: saveLink, attr: {href: saveLink, download: 'db.sql'}">Export DB</a>-->
 
 <div id="form">
-<select name="job" data-bind="
+<!--<select name="job" data-bind="
 					value: job,
 					options: jobList,
 					optionsText: 'name',
-					optionsValue: 'id'"></select>
+					optionsValue: 'id'"></select>-->
 
-<input data-bind="value: name">
+<input data-bind="value: properties.name">
 
-<ul data-bind="sortable: statPriority">
+<ul data-bind="sortable: properties.statpriority">
 	<li>
 		<span data-bind="text: $data"></span>
 		<span data-bind="click:  $parent.removeStat" class="deletestat">X</span>
 	</li>
 </ul>
-<select data-bind="	value: selectedNewStat,
-					options: baseStats,
+
+<select data-bind="	options: baseStats,
+					value: selectedStat,
 					optionsText: 'longname',
 					optionsValue: 'longname'
 "></select> <button data-bind="click: addPriority">Add</button>
 
 <br><br><br><br>
 
-<label>Hitdie:</label><input data-bind="value: hitdie" class="small" type="text">
+<label>Hitdie:</label><input data-bind="value: properties.hitdie" class="small" type="text">
 
-<div data-bind="visible: isDirty()">
+<!--<div data-bind="visible: isDirty()">
 	<button data-bind="click: saveJob">Save Job</button>
 	<button data-bind="click: resetJob">Reset Job</button>
-</div>
+</div>-->
 
 </div>
 

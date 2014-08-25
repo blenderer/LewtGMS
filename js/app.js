@@ -3,7 +3,8 @@ requirejs.config({
     paths: {
         app: '../app',
         knockout: 'knockoutdebug',
-        kosortable: 'knockout-sortable'
+        kosortable: 'knockout-sortable',
+        komapping: 'knockoutmapping'
     },
     shim: {
     	kosortable: {
