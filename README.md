@@ -1,4 +1,4 @@
-LewtJobAdmin
+LewtGMS(Game Content Management System)
 ============
 
 Job (character classes administration)
