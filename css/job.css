@@ -1,15 +1,3 @@
-input.small {
-	width: 33px;
-}
-
-#form {
-	display: none;
-}
-
-label {
-	margin-right: 1.4em;
-}
-
 #basestats {
 	list-style-type: none;
 	padding-left: 0;
