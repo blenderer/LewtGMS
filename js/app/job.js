@@ -186,11 +186,16 @@ require([
 		        var row = stmt.getAsObject();
 		        //turn our comma delimted string into an array
 		        row.statpriority = row.statpriority.split(",");
-		        row.secondary = JSON.parse('['+row.secondary+']');
-		        for (var i=0; i<row.secondary.length; i++) {
-		        	var secondaryStat = row.secondary[i];
-		        	secondaryStat.stat = _.findWhere(statList, {id: secondaryStat.stat*1}).longname;
-		        }
+		        if (row.secondary) {
+			        row.secondary = JSON.parse('['+row.secondary+']');
+			        for (var i=0; i<row.secondary.length; i++) {
+			        	var secondaryStat = row.secondary[i];
+			        	secondaryStat.stat = _.findWhere(statList, {id: secondaryStat.stat*1}).longname;
+			        }
+		    	}
+		    	else {
+		    		row.secondary = [];
+		    	}
 		        properties = row;
 		    }
 
