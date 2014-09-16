@@ -64,7 +64,7 @@ require([
 
 			//Adds a secondary stat to the Job
 			self.addSecondary = function() {
-				if (!_.contains(self.properties.secondary(), self.selectedSecondary())) {
+				if (!_.contains(_.pluck(self.properties.secondary(), "stat"), self.selectedSecondary())) {
 					self.properties.secondary.push({
 						stat: self.selectedSecondary(),
 						min: 0,
