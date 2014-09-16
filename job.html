@@ -36,7 +36,22 @@
 
 <br><br><br><br>
 
-<label>Hitdie:</label><input data-bind="value: properties.hitdie" class="small" type="text">
+<ul data-bind="foreach: properties.secondary">
+	<li>
+		<span data-bind="text: $data.stat"></span>
+		<input placeholder="Min" class="small" data-bind="value: $data.min">
+		<input placeholder="Max" class="small" data-bind="value: $data.max">
+		<span data-bind="click:  $parent.removeSecondary" class="deletestat">X</span>
+	</li>
+</ul>
+
+<select data-bind="	options: secondaryStats,
+					value: selectedSecondary,
+					optionsText: 'longname',
+					optionsValue: 'longname'
+"></select> <button data-bind="click: addSecondary">Add</button>
+
+<br><br><br><br>
 
 <div data-bind="visible: isDirty()">
 	<button data-bind="click: saveJob">Save Job</button>

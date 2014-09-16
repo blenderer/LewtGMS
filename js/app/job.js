@@ -45,10 +45,12 @@ require([
 
 			//Observables for when someone uses a bound select
 			self.selectedStat = ko.observable();
+			self.selectedSecondary = ko.observable();
 			self.selectedJob = ko.observable();
 
 			//All of the basestats: (str, dex, int, etc...)
 			self.baseStats = ko.observableArray(_.where(self.statlist, {basestat: 1}));
+			self.secondaryStats = ko.observableArray(_.where(self.statlist, {secondary: 1}));
 
 			//Adds a stat priority to the stat priority observable array
 			self.addPriority = function() {
@@ -57,6 +59,20 @@ require([
 				}
 				else {
 					alert("Stat Priority already contains that stat!");
+				}
+			}
+
+			//Adds a secondary stat to the Job
+			self.addSecondary = function() {
+				if (!_.contains(self.properties.secondary(), self.selectedSecondary())) {
+					self.properties.secondary.push({
+						stat: self.selectedSecondary(),
+						min: 0,
+						max: 0
+					});
+				}
+				else {
+					alert("Secondary stats already contains that stat!");
 				}
 			}
 
@@ -70,6 +86,10 @@ require([
 
 			self.removeStat = function(stat) {
 				self.properties.statpriority.remove(stat);
+			}
+			self.removeSecondary = function(stat) {
+				console.log(stat);
+				self.properties.secondary.remove(stat);
 			}
 
 			//Returns the job back to its "clean" state (Which we have saved)
@@ -156,6 +176,11 @@ require([
 		        var row = stmt.getAsObject();
 		        //turn our comma delimted string into an array
 		        row.statpriority = row.statpriority.split(",");
+		        row.secondary = JSON.parse('['+row.secondary+']');
+		        for (var i=0; i<row.secondary.length; i++) {
+		        	var secondaryStat = row.secondary[i];
+		        	secondaryStat.stat = _.findWhere(statList, {id: secondaryStat.stat*1}).longname;
+		        }
 		        properties = row;
 		    }
 
