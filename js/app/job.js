@@ -88,7 +88,6 @@ require([
 				self.properties.statpriority.remove(stat);
 			}
 			self.removeSecondary = function(stat) {
-				console.log(stat);
 				self.properties.secondary.remove(stat);
 			}
 
@@ -108,9 +107,20 @@ require([
 							return _.findWhere(self.statlist, {longname: longname}).id;
 						}).join();
 
+				var secondaries = [];
+
+				_.each(props.secondary, function(item) {
+					var statId = _.findWhere(self.statlist, {"longname": item.stat}).id;
+					item.stat = statId;
+					secondaries.push(item);
+				});
+
+				//Remove brackets for safe insert into sqlite
+				secondaries = JSON.stringify(secondaries).replace(/\[|\]/g, "");
+
 				var sql = "INSERT OR REPLACE INTO Jobs" +
-				"(id, name, hitdie, statpriority)" +
-				"VALUES ('"+props.id+"', '"+props.name+"', '"+props.hitdie+"', '"+idstatpriority+"')";
+				"(id, name, hitdie, statpriority, secondary)" +
+				"VALUES ('"+props.id+"', '"+props.name+"', '"+props.hitdie+"', '"+idstatpriority+"', '"+secondaries+"')";
 
 				
 
