@@ -11,6 +11,7 @@ require([
 		//When we add a file to the uploader, do the following
 		$("#fileupload").change(function() {
 			$("#form").show();
+			$("#fileupload").hide();
 			var f = $(this).prop("files")[0];
 		    var r = new FileReader();
 		    r.onload = function() {
@@ -119,8 +120,8 @@ require([
 				secondaries = JSON.stringify(secondaries).replace(/\[|\]/g, "");
 
 				var sql = "INSERT OR REPLACE INTO Jobs" +
-				"(id, name, hitdie, statpriority, secondary)" +
-				"VALUES ('"+props.id+"', '"+props.name+"', '"+props.hitdie+"', '"+idstatpriority+"', '"+secondaries+"')";
+				"(id, name, statpriority, secondary)" +
+				"VALUES ('"+props.id+"', '"+props.name+"', '"+idstatpriority+"', '"+secondaries+"')";
 
 				
 
