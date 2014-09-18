@@ -32,9 +32,9 @@ require([
 
 			//These properties need to not be observable
 			var options = {
-			    'copy': [
+			    /*'copy': [
 			    	"clean"
-			    ]
+			    ]*/
 			}
 
 			//Apply our ko.mapping
@@ -100,7 +100,7 @@ require([
 						longname: self.longname(),
 						type: self.type()
 					}
-					)) != self.clean;
+					)) != self.clean();
 			}).extend({ rateLimit: 10 });
 
 			return self;
