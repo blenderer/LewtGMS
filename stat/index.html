@@ -13,11 +13,17 @@
 
 <div id="form">
 	<select name="job" data-bind="
-					
+					value: selectedStat,
 					options: stats,
 					optionsText: 'longname',
 					optionsValue: 'id',
-					event: { change: changeStat}"></select>
+					event: { change: changeStat}"></select><br>
+	<label for="short">Short Name: </label><input data-bind="value: shortname" class="small" name="short" type="text">
+	<br><label for="long">Long Name: </label><input data-bind="value: longname" name="long" type="text">
+
+	<br>
+	<label>Base: <input data-bind="checked: type" name="statTypeGroup" type="radio" value="base"></label>
+	<label>Secondary: <input data-bind="checked: type" name="statTypeGroup" type="radio" value="secondary"></label>
 </div>
 
 <script data-main="app/app" src="../lib/require.js"></script>

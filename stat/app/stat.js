@@ -40,14 +40,14 @@ require([
 			//Apply our ko.mapping
 			self = komapping.fromJS(data, options);
 
-			
+			self.selectedStat = ko.observable();
 
 			//Gets bound to an anchor tag for download the saved DB
 			self.saveLink = ko.observable();
 
 			//Remaps the new data from a new job (Or the same one)
 			self.changeStat = function() {
-				komapping.fromJS(loadJob(self.selectedStat()), self)
+				komapping.fromJS(loadStats(self.selectedStat()), self)
 			}
 
 			//Returns the job back to its "clean" state (Which we have saved)
@@ -113,10 +113,26 @@ require([
 		    //If no job id provided, use the first one from the list
 		    var statId = stat || stats[0].id;
 
+		    var statObject = _.findWhere(stats, {id: statId});
+
+		    if (statObject.basestat) {
+		    	statObject.type = "base";
+		    }
+		    else if(statObject.secondary) {
+		    	statObject.type = "secondary";
+		    }
+
+		    delete statObject.basestat;
+		    delete statObject.secondary;
+
 		    //Return our object which will be consumed by the ViewModel
 		    return {
 		    	stats: stats,
-		    	clean: JSON.stringify(stats)
+		    	id: statObject.id,
+		    	shortname: statObject.shortname,
+		    	longname: statObject.longname,
+		    	type: statObject.type,
+		    	clean: JSON.stringify(statObject)
 		    };
 		}
 });
