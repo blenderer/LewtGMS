@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Lewt Job Generator</title>
+	<link rel="stylesheet" href="../base.css">
+	<link rel="stylesheet" href="stat.css">
+</head>
+<body>
+
+<input id="fileupload" type="file">
+<a data-bind="visible: saveLink, attr: {href: saveLink, download: 'db.sql'}">Export DB</a>
+
+<div id="form">
+	<select name="job" data-bind="
+					
+					options: stats,
+					optionsText: 'longname',
+					optionsValue: 'id',
+					event: { change: changeStat}"></select>
+</div>
+
+<script data-main="app/app" src="../lib/require.js"></script>
+
+</body>
+</html>

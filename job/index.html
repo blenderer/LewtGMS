@@ -3,8 +3,8 @@
 <head>
 	<meta charset="UTF-8">
 	<title>Lewt Job Generator</title>
-	<link rel="stylesheet" href="css/base.css">
-	<link rel="stylesheet" href="css/job.css">
+	<link rel="stylesheet" href="../base.css">
+	<link rel="stylesheet" href="job.css">
 </head>
 <body>
 
@@ -12,6 +12,7 @@
 <a data-bind="visible: saveLink, attr: {href: saveLink, download: 'db.sql'}">Export DB</a>
 
 <div id="form">
+<input data-bind="event: {click: newJob}" type="button" value="New Job"><br>
 <select name="job" data-bind="
 					value: selectedJob,
 					options: jobs,
@@ -60,7 +61,7 @@
 
 </div>
 
-<script data-main="js/app" src="js/lib/require.js"></script>
+<script data-main="app/app" src="../lib/require.js"></script>
 
 </body>
 </html>

@@ -1,15 +1,3 @@
-input.small {
-	width: 33px;
-}
-
-#form {
-	display: none;
-}
-
-label {
-	margin-right: 1.4em;
-}
-
 #basestats {
 	list-style-type: none;
 	padding-left: 0;
@@ -17,7 +5,6 @@ label {
 }
 
 span.deletestat {
-	margin-left: 1.4em;
 	color: red;
 	cursor: pointer;
 }

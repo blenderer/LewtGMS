@@ -1,19 +1,19 @@
 requirejs.config({
-    baseUrl: 'js/lib',
+    baseUrl: '../lib',
     paths: {
-        app: '../app',
+        app: '../stat/app',
         knockout: 'knockoutdebug',
         kosortable: 'knockout-sortable',
         komapping: 'knockoutmapping'
     },
     shim: {
-    	kosortable: {
-    		deps: ['knockout'],
-    		exports: 'kosortable'
-    	}
+        kosortable: {
+            deps: ['knockout'],
+            exports: 'kosortable'
+        }
     }
 });
 
 // Start loading the main app file. Put all of
 // your application logic in there.
-requirejs(['app/job']);
+requirejs(['app/stat']);
