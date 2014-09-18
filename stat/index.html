@@ -24,6 +24,12 @@
 	<br>
 	<label>Base: <input data-bind="checked: type" name="statTypeGroup" type="radio" value="base"></label>
 	<label>Secondary: <input data-bind="checked: type" name="statTypeGroup" type="radio" value="secondary"></label>
+	<label>None: <input data-bind="checked: type" name="statTypeGroup" type="radio" value="none"></label>
+
+	<div data-bind="visible: isDirty()">
+		<button data-bind="click: saveStat">Save Stat</button>
+		<button data-bind="click: changeStat">Reset Stat</button>
+	</div>
 </div>
 
 <script data-main="app/app" src="../lib/require.js"></script>

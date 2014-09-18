@@ -50,25 +50,32 @@ require([
 				komapping.fromJS(loadStats(self.selectedStat()), self)
 			}
 
-			//Returns the job back to its "clean" state (Which we have saved)
-			self.resetJob = function() {
-				_.each(JSON.parse(self.clean), function(value, key) {
-					self.properties[key](value);
-				});
+			self.getSavableProperties = function() {
+				var secondary = 0;
+				var base = 0;
+				if (self.type() == 'secondary') {
+					secondary = 1;
+				}
+				if (self.type() == 'base') {
+					base = 1;
+				}
+				return {
+					id: self.id(),
+					longname: self.longname(),
+					shortname: self.shortname(),
+					basestat: base,
+					secondary: secondary
+				}
 			}
 
 			self.saveStat = function() {
 				//makes our properties easy to work with
-				var props = ko.toJS(self.properties);
+				var currentStat = self.getSavableProperties();
 
-				//Recreates our comma-delimted id string for db insert
-				var idstatpriority = _.map(props.statpriority, function(longname) {
-							return _.findWhere(self.statlist, {longname: longname}).id;
-						}).join();
-
-				var sql = "INSERT OR REPLACE INTO Jobs" +
-				"(id, name, hitdie, statpriority)" +
-				"VALUES ('"+props.id+"', '"+props.name+"', '"+props.hitdie+"', '"+idstatpriority+"')";
+				var sql = "INSERT OR REPLACE INTO Stats_type" +
+				"(id, shortname, longname, basestat, secondary)" +
+				"VALUES ('"+currentStat.id+"', '"+currentStat.shortname+"', '"+currentStat.longname+
+					"', '"+currentStat.basestat+"', '"+currentStat.secondary+"')";
 
 				
 
@@ -79,16 +86,22 @@ require([
 	        	self.saveLink(window.URL.createObjectURL(blob));
 
 	        	//Reload the selected job so our viewmodel is clean
-	        	self.changeJob();
+	        	self.changeStat();
 			}
 
 			//Compares the current viewmodel to the original state on load
 			//We use a rateLimit extension because for some reason it was calculating
 			//too fast after we saved
 			self.isDirty = ko.computed(function() {
-				return JSON.stringify(ko.toJS(self.properties)) != self.clean;
+				return JSON.stringify(ko.toJS(
+					{
+						id: self.id(),
+						shortname: self.shortname(),
+						longname: self.longname(),
+						type: self.type()
+					}
+					)) != self.clean;
 			}).extend({ rateLimit: 10 });
-
 
 			return self;
 		}
@@ -120,6 +133,9 @@ require([
 		    }
 		    else if(statObject.secondary) {
 		    	statObject.type = "secondary";
+		    }
+		    else {
+		    	statObject.type = "none";
 		    }
 
 		    delete statObject.basestat;
