@@ -112,14 +112,33 @@ require([
 				});
 			}
 
+			self.getChanged = function(oldArray, newArray) {
+				return {
+					"added": _.difference(newArray, oldArray),
+					"removed": _.difference(oldArray, newArray)
+				}
+			}
+
 			self.saveJob = function() {
 				//makes our properties easy to work with
 				var props = ko.toJS(self.properties);
 
 				//Recreates our comma-delimted id string for db insert
-				var idstatpriority = _.map(props.statpriority, function(longname) {
+				/*var idstatpriority = _.map(props.statpriority, function(longname) {
 							return _.findWhere(self.statlist, {longname: longname}).id;
-						}).join();
+						}).join();*/
+
+				var priorityDiff = self.getChanged(JSON.parse(self.clean).statpriority, props.statpriority);
+
+				//save any added priorities
+				for (var i=0; i<priorityDiff.added; i++) {
+
+				}
+
+				//save any removed priorities
+				for (var i=0; i<priorityDiff.removed; i++) {
+
+				}
 
 				var secondaries = [];
 
@@ -133,8 +152,8 @@ require([
 				secondaries = JSON.stringify(secondaries).replace(/\[|\]/g, "");
 
 				var sql = "INSERT OR REPLACE INTO Jobs" +
-				"(id, name, statpriority, secondary)" +
-				"VALUES ('"+props.id+"', '"+props.name+"', '"+idstatpriority+"', '"+secondaries+"')";
+				"(id, name)" +
+				"VALUES ('"+props.id+"', '"+props.name+"')";
 
 				
 
@@ -198,31 +217,22 @@ require([
 			
 			while(stmt.step()) {
 		        var row = stmt.getAsObject();
-		        //turn our comma delimted string into an array
-		        if (row.statpriority) {
-		        	row.statpriority = row.statpriority.split(",");
-		        }
-		        else {
-		        	row.statpriority = [];
-		        }
-		        
-		        if (row.secondary) {
-			        row.secondary = JSON.parse('['+row.secondary+']');
-			        for (var i=0; i<row.secondary.length; i++) {
-			        	var secondaryStat = row.secondary[i];
-			        	secondaryStat.stat = _.findWhere(statList, {id: secondaryStat.stat*1}).longname;
-			        }
-		    	}
-		    	else {
-		    		row.secondary = [];
-		    	}
+		        row.statpriority = []
+
+		    	//get stat priorities
+		    	var stpr = db.prepare("select st.shortname, st.longname from jobs_priorities jp, stats_type st where job_id = "+row.id+" and st.id = jp.stat_id order by priority ASC");
+				stpr.getAsObject();
+				while(stpr.step()) {
+					row.statpriority.push(stpr.getAsObject().longname);
+				}
+
 		        properties = row;
 		    }
 
 		    //Then step through the array and map it to its human-readable name
-		    for (var i=0; i<properties.statpriority.length; i++) {
+		    /*for (var i=0; i<properties.statpriority.length; i++) {
 		    	properties.statpriority[i] = _.findWhere(statList, {id: properties.statpriority[i]*1}).longname;
-		    }
+		    }*/
 
 		    //Return our object which will be consumed by the ViewModel
 		    return {
