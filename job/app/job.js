@@ -67,9 +67,10 @@ require([
 			self.addSecondary = function() {
 				if (!_.contains(_.pluck(self.properties.secondary(), "stat"), self.selectedSecondary())) {
 					self.properties.secondary.push({
-						stat: self.selectedSecondary(),
+						longname: self.selectedSecondary(),
 						min: 0,
-						max: 0
+						max: 0,
+						stat_id: _.findWhere(self.secondaryStats(), {longname: self.selectedSecondary()}).id
 					});
 				}
 				else {
@@ -112,10 +113,43 @@ require([
 				});
 			}
 
+			var stringyJsonString = function(crappyJsonString) {
+				var pattern = /(\:\s*)(\-*[\d+\.]+)(\s*[,}])/g;
+				var replace = '$1"$2"$3';
+				return crappyJsonString.replace(pattern, replace)
+			};
+
+			var stringyProperties = function(object) {
+				var properJSONString = JSON.stringify({data: object});
+				var JSONStringWithStringyNumbers = stringyJsonString(properJSONString);
+				var finalObject = JSON.parse(JSONStringWithStringyNumbers);
+				return finalObject.data;
+			};
+
 			self.getChanged = function(oldArray, newArray) {
+				oldArray = stringyProperties(oldArray);
+				newArray = stringyProperties(newArray);
+
+				for (var i=0; i<oldArray.length; i++) {
+					oldArray[i] = JSON.stringify(oldArray[i])
+				}
+				for (var i=0; i<newArray.length; i++) {
+					newArray[i] = JSON.stringify(newArray[i])
+				}
+
+				var added = _.difference(newArray, oldArray);
+				var removed = _.difference(oldArray, newArray);
+
+				for (var i=0; i<added.length; i++) {
+					added[i] = JSON.parse(added[i]);
+				}
+				for (var i=0; i<removed.length; i++) {
+					removed[i] = JSON.parse(removed[i]);
+				}
+
 				return {
-					"added": _.difference(newArray, oldArray),
-					"removed": _.difference(oldArray, newArray)
+					"added": added,
+					"removed": removed
 				}
 			}
 
@@ -123,33 +157,54 @@ require([
 				//makes our properties easy to work with
 				var props = ko.toJS(self.properties);
 
-				//Recreates our comma-delimted id string for db insert
-				/*var idstatpriority = _.map(props.statpriority, function(longname) {
-							return _.findWhere(self.statlist, {longname: longname}).id;
-						}).join();*/
-
 				var priorityDiff = self.getChanged(JSON.parse(self.clean).statpriority, props.statpriority);
+				var secondaryDiff = self.getChanged(JSON.parse(self.clean).secondary, props.secondary);
+				var jobId = self.properties.id();
 
 				//save any added priorities
-				for (var i=0; i<priorityDiff.added; i++) {
-
+				for (var i=0; i<priorityDiff.added.length; i++) {
+					var newStat = priorityDiff.added[i];
+					var order = self.properties.statpriority().indexOf(newStat);
+					var statId = _.findWhere(self.statlist, {longname: newStat}).id;
+					var sql = 'INSERT INTO job_priorities (job_id, priority, stat_id) VALUES ' +
+							  '(' + jobId + ', ' + order + ', ' + statId + ')';
+					db.run(sql);
 				}
 
 				//save any removed priorities
-				for (var i=0; i<priorityDiff.removed; i++) {
+				for (var i=0; i<priorityDiff.removed.length; i++) {
+					var removingStat = priorityDiff.removed[i];
+					var statId = _.findWhere(self.statlist, {longname: removingStat}).id;
 
+					var sql = 'DELETE FROM job_priorities where job_id = ' + jobId +
+							  ' and stat_id = ' + statId;
+					db.run(sql);
 				}
 
-				var secondaries = [];
+				//Now update the order/priority
+				for (var i=0; i<=props.statpriority.length - 1; i++) {
+					var statId = _.findWhere(self.statlist, {longname: props.statpriority[i]}).id;
+					var sql = 'UPDATE job_priorities set priority = ' + i + ' WHERE job_id = ' +
+							  jobId + ' and stat_id = ' + statId;
+					db.run(sql);
+				}
 
-				_.each(props.secondary, function(item) {
-					var statId = _.findWhere(self.statlist, {"longname": item.stat}).id;
-					item.stat = statId;
-					secondaries.push(item);
-				});
+				//save any added secondaries
+				for (var i=0; i<secondaryDiff.added.length; i++) {
+					var newStat = secondaryDiff.added[i];
 
-				//Remove brackets for safe insert into sqlite
-				secondaries = JSON.stringify(secondaries).replace(/\[|\]/g, "");
+					var sql = 'INSERT INTO job_secondaries (min, max, job_id, stat_id) VALUES ' +
+							  '(' + newStat.min + ', ' + newStat.max + ', ' + jobId + ', ' + newStat.stat_id + ')';
+					db.run(sql);
+				}
+
+				//save any removed secondaries
+				for (var i=0; i<secondaryDiff.removed.length; i++) {
+					var removingStat = secondaryDiff.removed[i];
+
+					var sql = 'DELETE FROM job_secondaries where id = ' + removingStat.id;
+					db.run(sql);
+				}
 
 				var sql = "INSERT OR REPLACE INTO Jobs" +
 				"(id, name)" +
@@ -171,7 +226,7 @@ require([
 			//We use a rateLimit extension because for some reason it was calculating
 			//too fast after we saved
 			self.isDirty = ko.computed(function() {
-				return JSON.stringify(ko.toJS(self.properties)) != self.clean;
+				return JSON.stringify(stringyProperties(ko.toJS(self.properties))) != stringyJsonString(self.clean);
 			}).extend({ rateLimit: 10 });
 
 
@@ -217,22 +272,25 @@ require([
 			
 			while(stmt.step()) {
 		        var row = stmt.getAsObject();
-		        row.statpriority = []
+		        row.statpriority = [];
 
 		    	//get stat priorities
-		    	var stpr = db.prepare("select st.shortname, st.longname from jobs_priorities jp, stats_type st where job_id = "+row.id+" and st.id = jp.stat_id order by priority ASC");
+		    	var stpr = db.prepare("select st.longname from job_priorities jp, stats_type st where job_id = "+row.id+" and st.id = jp.stat_id order by priority ASC");
 				stpr.getAsObject();
 				while(stpr.step()) {
 					row.statpriority.push(stpr.getAsObject().longname);
 				}
 
+				row.secondary = [];
+				//get secondary stats
+				var stSec = db.prepare("select js.id, js.stat_id, st.longname, js.min, js.max from job_secondaries js, stats_type st where job_id = "+row.id+" and st.id = js.stat_id");
+				while(stSec.step()) {
+					row.secondary.push(stSec.getAsObject());
+				}
+
+
 		        properties = row;
 		    }
-
-		    //Then step through the array and map it to its human-readable name
-		    /*for (var i=0; i<properties.statpriority.length; i++) {
-		    	properties.statpriority[i] = _.findWhere(statList, {id: properties.statpriority[i]*1}).longname;
-		    }*/
 
 		    //Return our object which will be consumed by the ViewModel
 		    return {

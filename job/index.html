@@ -39,7 +39,7 @@
 
 <ul data-bind="foreach: properties.secondary">
 	<li>
-		<span data-bind="text: $data.stat"></span>
+		<span data-bind="text: $data.longname"></span>
 		<input placeholder="Min" class="small" data-bind="value: $data.min">
 		<input placeholder="Max" class="small" data-bind="value: $data.max">
 		<span data-bind="click:  $parent.removeSecondary" class="deletestat">X</span>
