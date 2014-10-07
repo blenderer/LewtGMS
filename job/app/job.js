@@ -5,9 +5,10 @@ require([
 	'knockout',
 	'komapping',
 	'kosortable',
-	'underscore'
-	], function ($, jui, SQL, ko, komapping, kosort, _) {
-
+	'underscore',
+	'lewtgms.common'
+	], function ($, jui, SQL, ko, komapping, kosort, _, common) {
+		console.log(common);
 		//When we add a file to the uploader, do the following
 		$("#fileupload").change(function() {
 			$("#form").show();
@@ -113,52 +114,12 @@ require([
 				});
 			}
 
-			var stringyJsonString = function(crappyJsonString) {
-				var pattern = /(\:\s*)(\-*[\d+\.]+)(\s*[,}])/g;
-				var replace = '$1"$2"$3';
-				return crappyJsonString.replace(pattern, replace)
-			};
-
-			var stringyProperties = function(object) {
-				var properJSONString = JSON.stringify({data: object});
-				var JSONStringWithStringyNumbers = stringyJsonString(properJSONString);
-				var finalObject = JSON.parse(JSONStringWithStringyNumbers);
-				return finalObject.data;
-			};
-
-			self.getChanged = function(oldArray, newArray) {
-				oldArray = stringyProperties(oldArray);
-				newArray = stringyProperties(newArray);
-
-				for (var i=0; i<oldArray.length; i++) {
-					oldArray[i] = JSON.stringify(oldArray[i])
-				}
-				for (var i=0; i<newArray.length; i++) {
-					newArray[i] = JSON.stringify(newArray[i])
-				}
-
-				var added = _.difference(newArray, oldArray);
-				var removed = _.difference(oldArray, newArray);
-
-				for (var i=0; i<added.length; i++) {
-					added[i] = JSON.parse(added[i]);
-				}
-				for (var i=0; i<removed.length; i++) {
-					removed[i] = JSON.parse(removed[i]);
-				}
-
-				return {
-					"added": added,
-					"removed": removed
-				}
-			}
-
 			self.saveJob = function() {
 				//makes our properties easy to work with
 				var props = ko.toJS(self.properties);
 
-				var priorityDiff = self.getChanged(JSON.parse(self.clean).statpriority, props.statpriority);
-				var secondaryDiff = self.getChanged(JSON.parse(self.clean).secondary, props.secondary);
+				var priorityDiff = common.getChanged(JSON.parse(self.clean).statpriority, props.statpriority);
+				var secondaryDiff = common.getChanged(JSON.parse(self.clean).secondary, props.secondary);
 				var jobId = self.properties.id();
 
 				//save any added priorities
@@ -226,7 +187,7 @@ require([
 			//We use a rateLimit extension because for some reason it was calculating
 			//too fast after we saved
 			self.isDirty = ko.computed(function() {
-				return JSON.stringify(stringyProperties(ko.toJS(self.properties))) != stringyJsonString(self.clean);
+				return JSON.stringify(common.stringyProperties(ko.toJS(self.properties))) != common.stringyJsonString(self.clean);
 			}).extend({ rateLimit: 10 });
 
 
