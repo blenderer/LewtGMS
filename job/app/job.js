@@ -1,18 +1,16 @@
 require([
-	'jquery',
-	'jquery.ui.sortable',
 	'sql',
 	'knockout',
 	'komapping',
 	'kosortable',
 	'underscore',
 	'lewtgms.common'
-	], function ($, jui, SQL, ko, komapping, kosort, _, common) {
+	], function (SQL, ko, komapping, kosort, _, common) {
+
 	//When we add a file to the uploader, do the following
-	$("#fileupload input").change(function() {
-		$("#form").show();
-		$("#fileupload").hide();
-		var f = $(this).prop("files")[0];
+	var initInterface = function() {
+		var formElement = document.getElementById('form');
+		var f = this.files[0];
 	    var r = new FileReader();
 	    r.onload = function() {
 	        var Uints = new Uint8Array(r.result);
@@ -22,10 +20,14 @@ require([
 	        //Make our viewmodel global, so we can easily debug in chrome
 	        viewModel = viewModel();
 	        //Then apply the binding
-	        ko.applyBindings(viewModel);
+	        ko.applyBindings(viewModel, formElement);
+	        formElement.style.display = "block";
 	    }
 	    r.readAsArrayBuffer(f);
-	});
+	}
+
+	var uploader = document.querySelector("#fileupload input");
+	uploader.addEventListener('change', initInterface);
 
 	var viewModel = function() {
 		//get our data from the db first
