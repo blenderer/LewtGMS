@@ -12,9 +12,8 @@
 	<input id="fileupload" type="file">
 </div>
 
-<a data-bind="visible: saveLink, attr: {href: saveLink, download: 'db.sql'}">Export DB</a>
-
 <div id="form">
+<a data-bind="visible: saveLink, attr: {href: saveLink, download: 'db.sql'}">Export DB</a>
 <input data-bind="event: {click: newJob}" type="button" value="New Job"><br>
 <select name="job" data-bind="
 					value: selectedJob,

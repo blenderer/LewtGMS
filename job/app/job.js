@@ -7,6 +7,7 @@ require([
 	'lewtgms.common'
 	], function (SQL, ko, komapping, kosort, _, common) {
 
+	var uploader = document.querySelector("#fileupload input");
 	//When we add a file to the uploader, do the following
 	var initInterface = function() {
 		var formElement = document.getElementById('form');
@@ -22,14 +23,15 @@ require([
 	        //Then apply the binding
 	        ko.applyBindings(viewModel, formElement);
 	        formElement.style.display = "block";
+	        uploader.style.display = "none";
 	    }
 	    r.readAsArrayBuffer(f);
 	}
 
-	var uploader = document.querySelector("#fileupload input");
 	uploader.addEventListener('change', initInterface);
 
-	var viewModel = function() {
+	//keep this global for debugging porpoises
+	viewModel = function() {
 		//get our data from the db first
 		var data = loadJob();
 
