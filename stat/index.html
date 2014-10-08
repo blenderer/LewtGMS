@@ -8,10 +8,12 @@
 </head>
 <body>
 
-<input id="fileupload" type="file">
-<a data-bind="visible: saveLink, attr: {href: saveLink, download: 'db.sql'}">Export DB</a>
+<div id="fileupload">
+	<input type="file">
+</div>
 
 <div id="form">
+<a data-bind="visible: saveLink, attr: {href: saveLink, download: 'db.sql'}">Export DB</a>
 	<select name="job" data-bind="
 					value: selectedStat,
 					options: stats,
