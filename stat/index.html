@@ -13,27 +13,25 @@
 </div>
 
 <div id="form">
-<a data-bind="visible: saveLink, attr: {href: saveLink, download: 'db.sql'}">Export DB</a>
+
 	<select name="job" data-bind="
 					value: selectedStat,
 					options: stats,
-					optionsText: 'longname',
-					optionsValue: 'id',
-					event: { change: changeStat}"></select><button data-bind="event: {click: removeStatAndRefs}">X</button>
+					optionsText: 'long',
+					optionsValue: 'long',
+					event: {change: changeSelected}"></select><button data-bind="">X</button>
 
-	<br>
-	<label for="short">Short Name: </label><input data-bind="value: shortname" class="small" name="short" type="text">
-	<br><label for="long">Long Name: </label><input data-bind="value: longname" name="long" type="text">
-
-	<br>
-	<label>Base: <input data-bind="checked: type" name="statTypeGroup" type="radio" value="base"></label>
-	<label>Secondary: <input data-bind="checked: type" name="statTypeGroup" type="radio" value="secondary"></label>
-	<label>None: <input data-bind="checked: type" name="statTypeGroup" type="radio" value="none"></label>
-
-	<div data-bind="visible: isDirty()">
-		<button data-bind="click: saveStat">Save Stat</button>
-		<button data-bind="click: changeStat">Reset Stat</button>
+	<div data-bind="foreach: stats">
+		<div data-bind="visible: selected">
+			<label for="short">Short Name: </label><input data-bind="value: short" class="small" name="short" type="text">
+			<br><label for="long">Long Name: </label><input data-bind="value: long" name="long" type="text">
+			<br><br>
+			<label>Base: <input data-bind="checked: base" type="checkbox" value="base"></label>
+		</div>
 	</div>
+
+	<button data-bind="event {click: save}">Save</button><br>
+	<a data-bind="visible: saveLink, attr: {href: saveLink, download: 'stats.json'}">Right Click to download</a>
 </div>
 
 <script data-main="app/app" src="../lib/require.js"></script>
