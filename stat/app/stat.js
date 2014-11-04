@@ -54,6 +54,19 @@ require([
 				komapping.fromJS(loadStats(self.selectedStat()), self)
 			}
 
+			self.removeStatAndRefs = function() {
+				if (window.confirm("Do you really want to delete this stat?")) { 
+					var sql = "DELETE FROM Stats_type where id=" + self.id();
+					db.run(sql);
+
+					var sql2 = "DELETE FROM Job_priorities where stat_id = " + self.id();
+					db.run(sql2);
+
+					var sql3 = "DELETE FROM Job_secondaries where stat_id = " + self.id();
+					db.run(sql3);
+				}
+			}
+
 			self.getSavableProperties = function() {
 				var secondary = 0;
 				var base = 0;
@@ -152,7 +165,7 @@ require([
 		    	shortname: statObject.shortname,
 		    	longname: statObject.longname,
 		    	type: statObject.type,
-		    	clean: JSON.stringify(statObject)
+		    	clean: JSON.stringify(stats)
 		    };
 		}
 });

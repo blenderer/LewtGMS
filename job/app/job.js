@@ -39,8 +39,6 @@ require([
 		var options = {
 		    'copy': [
 		    	"statlist",
-		    	"jobs.id",
-		    	"jobs.name",
 		    	"clean"
 		    ]
 		}
@@ -117,6 +115,14 @@ require([
 			});
 		}
 
+		self.removeJob = function() {
+			if (window.confirm("Do you really want to delete this job?")) { 
+				self.jobs.remove(function(item) { 
+					return item.id() == self.properties.id() 
+				});
+			}
+		}
+
 		self.saveJob = function() {
 			//makes our properties easy to work with
 			var props = ko.toJS(self.properties);
@@ -190,7 +196,9 @@ require([
 		//We use a rateLimit extension because for some reason it was calculating
 		//too fast after we saved
 		self.isDirty = ko.computed(function() {
-			return JSON.stringify(common.stringyProperties(ko.toJS(self.properties))) != common.stringyJsonString(self.clean);
+			return JSON.stringify(common.stringyProperties(ko.toJS(self.properties))) 
+			!= 
+			common.stringyJsonString(self.clean);
 		}).extend({ rateLimit: 10 });
 
 

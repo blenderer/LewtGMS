@@ -19,7 +19,9 @@
 					options: stats,
 					optionsText: 'longname',
 					optionsValue: 'id',
-					event: { change: changeStat}"></select><br>
+					event: { change: changeStat}"></select><button data-bind="event: {click: removeStatAndRefs}">X</button>
+
+	<br>
 	<label for="short">Short Name: </label><input data-bind="value: shortname" class="small" name="short" type="text">
 	<br><label for="long">Long Name: </label><input data-bind="value: longname" name="long" type="text">
 
