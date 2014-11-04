@@ -13,55 +13,22 @@
 </div>
 
 <div id="form">
-<a data-bind="visible: saveLink, attr: {href: saveLink, download: 'db.sql'}">Export DB</a>
-<input data-bind="event: {click: newJob}" type="button" value="New Job"><br>
-<select name="job" data-bind="
+
+	<select name="job" data-bind="
 					value: selectedJob,
 					options: jobs,
 					optionsText: 'name',
-					optionsValue: 'id',
-					event: { change: changeJob}"></select>
-<button data-bind="event: {click: removeJob}">X</button>
+					optionsValue: 'name',
+					event: {change: changeSelected}"></select><button data-bind="">X</button>
 
-<input data-bind="value: properties.name">
+	<div data-bind="foreach: jobs">
+		<div data-bind="visible: selected">
+			<label for="name">Name: </label><input data-bind="value: name" name="name" type="text">
+		</div>
+	</div>
 
-<ul data-bind="sortable: properties.statpriority">
-	<li>
-		<span data-bind="text: $data"></span>
-		<span data-bind="click:  $parent.removeStat" class="deletestat">X</span>
-	</li>
-</ul>
-
-<select data-bind="	options: baseStats,
-					value: selectedStat,
-					optionsText: 'longname',
-					optionsValue: 'longname'
-"></select> <button data-bind="click: addPriority">Add</button>
-
-<br><br><br><br>
-
-<ul data-bind="foreach: properties.secondary">
-	<li>
-		<span data-bind="text: $data.longname"></span>
-		<input placeholder="Min" class="small" data-bind="value: $data.min">
-		<input placeholder="Max" class="small" data-bind="value: $data.max">
-		<span data-bind="click:  $parent.removeSecondary" class="deletestat">X</span>
-	</li>
-</ul>
-
-<select data-bind="	options: secondaryStats,
-					value: selectedSecondary,
-					optionsText: 'longname',
-					optionsValue: 'longname'
-"></select> <button data-bind="click: addSecondary">Add</button>
-
-<br><br><br><br>
-
-<div data-bind="visible: isDirty()">
-	<button data-bind="click: saveJob">Save Job</button>
-	<button data-bind="click: resetJob">Reset Job</button>
-</div>
-
+	<button data-bind="event {click: save}">Save</button><br>
+	<a data-bind="visible: saveLink, attr: {href: saveLink, download: 'jobs.json'}">Right Click to download</a>
 </div>
 
 <script data-main="app/app" src="../lib/require.js"></script>
