@@ -19,7 +19,7 @@
 					options: stats,
 					optionsText: 'long',
 					optionsValue: 'long',
-					event: {change: changeSelected}"></select><button data-bind="">X</button>
+					event: {change: changeSelected}"></select><button data-bind="event: {click: removeSelected}">X</button>
 
 	<div data-bind="foreach: stats">
 		<div data-bind="visible: selected">

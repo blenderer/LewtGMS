@@ -54,12 +54,18 @@ require([
 			self.saveLink = ko.observable();
 
 			self.changeSelected = function() {
-				for (var i=0; i<data.stats.length; i++) {
+				for (var i=0; i<self.stats().length; i++) {
 					self.stats()[i].selected(false);
 				}
 				_.find(self.stats(), function(stat) {
 					return stat.long() == self.selectedStat();
 				}).selected(true);
+			}
+
+			self.removeSelected = function() {
+				self.stats.remove(_.find(self.stats(), function(stat) {
+					return stat.selected()
+				}));
 			}
 
 			self.save = function() {
