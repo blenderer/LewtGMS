@@ -28,11 +28,14 @@
 			<ul data-bind="foreach: statpriority">
 				<li>
 					<span data-bind="text: $data"></span>
-					<button data-bind="event: {click: $parent.movePriorityUp}">&uarr;</button>
-					<button data-bind="event: {click: $parent.movePriorityDown}">&darr;</button>
-					<button data-bind="event: {click: $parent.removePriority}">X</button>
+					<button data-bind="event: {click: $root.movePriorityUp}">&uarr;</button>
+					<button data-bind="event: {click: $root.movePriorityDown}">&darr;</button>
+					<button data-bind="event: {click: $root.removePriority}">X</button>
 				</li>
 			</ul>
+			<div data-bind="foreach: $parent.notPriorityList()">
+				<button data-bind="text: $data"></button>
+			</div>	
 			<br><h3>Secondary Stats: </h3>
 			<ul data-bind="foreach: secondaries">
 				<li>
@@ -41,7 +44,7 @@
 					<input class="small" data-bind="value: max" type="text">
 					<button data-bind="event: {click: removeSecondary}">X</button>
 				</li>
-			</ul>			
+			</ul>
 		</div>
 	</div>
 

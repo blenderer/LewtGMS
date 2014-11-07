@@ -22,18 +22,6 @@ require([
 			self.jobs()[i].selected = ko.observable(false)
 			self.jobs()[i].id = ko.observable(i);
 
-			self.jobs()[i].removePriority = function() {
-
-			}
-
-			self.jobs()[i].movePriorityUp = function() {
-
-			}
-
-			self.jobs()[i].movePriorityDown = function() {
-
-			}
-
 			for (var secondary=0; secondary<self.jobs()[i].secondaries().length; secondary++) {
 				self.jobs()[i].secondaries()[secondary].removeSecondary = function() {
 					
@@ -56,6 +44,10 @@ require([
 			}).selected(true)
 		}
 
+		self.getSelectedJob = function() {
+			return _.find(self.jobs(), function(job) { return job.selected()});
+		}
+
 		self.newJob = function() {
 			var newId = self.jobs().length + 1;
 			self.stats.push({
@@ -73,6 +65,58 @@ require([
 				return job.selected()
 			}));
 		}
+
+		self.removePriority = function(stat) {
+			var selectedJob = self.getSelectedJob();
+			var statP = selectedJob.statpriority;
+			statP.remove(stat);
+		}
+
+		self.movePriorityUp = function(stat) {
+			var selectedJob = self.getSelectedJob();
+			var statP = selectedJob.statpriority;
+			var triggeredStatArrayIndex = statP.indexOf(stat);
+
+			var newPos = triggeredStatArrayIndex - 1;
+
+			if (newPos < 0) {
+				return false;
+			}
+
+			statP.splice(triggeredStatArrayIndex, 1);
+			statP = statP.splice(newPos, 0, stat);
+		}
+
+		self.movePriorityDown = function(stat) {
+			var selectedJob = self.getSelectedJob();
+			var statP = selectedJob.statpriority;
+			var triggeredStatArrayIndex = statP.indexOf(stat);
+
+			var newPos = triggeredStatArrayIndex + 1;
+
+			if (newPos > statP().length - 1) {
+				return false;
+			}
+
+			statP.splice(triggeredStatArrayIndex, 1);
+			statP = statP.splice(newPos, 0, stat);
+		}
+
+		self.getBaseStats = function() {
+			return _.filter(self.stats(), function(stat) {
+				return stat.base()
+			});
+		}
+
+		self.notPriorityList = ko.computed(function() {
+			var selectedJob = self.getSelectedJob();
+			var statP = selectedJob.statpriority;
+
+			var baseStatList = _.map(komapping.toJS(self.getBaseStats()), function(stat){return stat.short});
+			var statPList = komapping.toJS(statP);
+
+			return ko.observableArray(_.difference(baseStatList, statPList));
+		})
 
 		self.save = function() {
 			//File creation magic
