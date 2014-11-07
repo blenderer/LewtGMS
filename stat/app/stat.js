@@ -26,22 +26,23 @@ require([
 		uploader.addEventListener('change', initInterface);
 
 		viewModel = function(data) {
-
+			//map the original properties so we dont add in unecessary IDs and selected stuff
 			data.originalProps = common.getPropertyMap(data);
 
+			//originalProps doesn't need to be observable
 			var options = {
 				"copy": ["originalProps"]
 			};
 
+			//bind the data to the viewmodel
 			var self = komapping.fromJS(data, options);
 
+			//Add in some observables to help us order and select things on the UI
 			for (var i=0; i<self.stats().length; i++) {
 				self.stats()[i].selected = ko.observable(false)
 				self.stats()[i].id = ko.observable(i);
 			}
-
 			self.stats()[0].selected(true);
-
 			self.selectedStat = ko.observable("");
 
 			//Gets bound to an anchor tag for download the saved DB
