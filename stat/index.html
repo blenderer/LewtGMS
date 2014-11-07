@@ -13,13 +13,12 @@
 </div>
 
 <div id="form">
-
 	<select name="job" data-bind="
 					value: selectedStat,
 					options: stats,
 					optionsText: 'long',
-					optionsValue: 'long',
-					event: {change: changeSelected}"></select><button data-bind="event: {click: removeSelected}">X</button>
+					optionsValue: 'id',
+					event: {change: changeSelected}"></select><button data-bind="event: {click: removeSelectedStat}">X</button><button data-bind="event: {click: newStat}">Add New</button>
 
 	<div data-bind="foreach: stats">
 		<div data-bind="visible: selected">

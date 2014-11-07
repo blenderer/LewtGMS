@@ -1,10 +1,9 @@
 require([
 	'knockout',
 	'komapping',
-	'kosortable',
 	'underscore',
 	'lewtgms.common'
-	], function (ko, komapping, kosort, _, common) {
+	], function (ko, komapping, _, common) {
 
 		var uploader = document.querySelector("#fileupload input");
 		//When we add a file to the uploader, do the following
@@ -16,7 +15,8 @@ require([
 		        //Make our viewmodel global, so we can easily debug in chrome
 		        //viewModel = viewModel(JSON.parse(r.result));
 		        //Then apply the binding
-		        ko.applyBindings(viewModel(JSON.parse(r.result), formElement));
+
+		        ko.applyBindings(viewModel(JSON.parse(r.result)), formElement);
 		        formElement.style.display = "block";
 		        uploader.style.display = "none";
 		    }
@@ -27,26 +27,20 @@ require([
 
 		viewModel = function(data) {
 
-			for (var i=0; i<data.stats.length; i++) {
-				data.stats[i].selected = false;
+			data.originalProps = common.getPropertyMap(data);
+
+			var options = {
+				"copy": ["originalProps"]
+			};
+
+			var self = komapping.fromJS(data, options);
+
+			for (var i=0; i<self.stats().length; i++) {
+				self.stats()[i].selected = ko.observable(false)
+				self.stats()[i].id = ko.observable(i);
 			}
 
-			data.stats[0].selected = true;
-
-			var self = komapping.fromJS(data);
-
-			self.baseFields = ["short", "long", "base"];
-
-			self.originalProps = function(){ return _.map(ko.toJS(self).stats, function(stat) {
-				var returnSet = {};
-
-				for (var i=0; i<self.baseFields.length; i++) {
-					var property = self.baseFields[i]
-					returnSet[property] = stat[property];
-				}
-
-				return returnSet;
-			})};
+			self.stats()[0].selected(true);
 
 			self.selectedStat = ko.observable("");
 
@@ -57,12 +51,26 @@ require([
 				for (var i=0; i<self.stats().length; i++) {
 					self.stats()[i].selected(false);
 				}
+
 				_.find(self.stats(), function(stat) {
-					return stat.long() == self.selectedStat();
-				}).selected(true);
+					return stat.id() == self.selectedStat()
+				}).selected(true)
 			}
 
-			self.removeSelected = function() {
+			self.newStat = function() {
+				var newId = self.stats().length + 1;
+				self.stats.push({
+					"long": ko.observable("{Enter Name}"),
+					"short": ko.observable(""),
+					"id": ko.observable(self.stats().length + 1),
+					"base": ko.observable(false),
+					"selected": ko.observable(false)
+				});
+				self.selectedStat(newId);
+				self.changeSelected();
+			}
+
+			self.removeSelectedStat = function() {
 				self.stats.remove(_.find(self.stats(), function(stat) {
 					return stat.selected()
 				}));
@@ -70,8 +78,14 @@ require([
 
 			self.save = function() {
 				//File creation magic
-				var blob = new Blob([JSON.stringify({"stats": self.originalProps()}, null, '    ')], {type: "application/octet-stream"});
+				var originalProps = self.originalProps;
+				delete self.originalProps;
+				var removed = common.removeAppSpecificProperties(komapping.toJS(self), originalProps);
+
+				var blob = new Blob([JSON.stringify(removed, null, '    ')], {type: "application/octet-stream"});
 	        	self.saveLink(window.URL.createObjectURL(blob));
+
+	        	self.originalProps = originalProps;
 			}
 
 			return self;
