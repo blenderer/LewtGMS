@@ -18,12 +18,30 @@
 					value: selectedJob,
 					options: jobs,
 					optionsText: 'name',
-					optionsValue: 'name',
-					event: {change: changeSelected}"></select><button data-bind="">X</button>
+					optionsValue: 'id',
+					event: {change: changeSelectedJob}"></select><button data-bind="event: {click: removeSelectedJob}">X</button>
 
 	<div data-bind="foreach: jobs">
 		<div data-bind="visible: selected">
-			<label for="name">Name: </label><input data-bind="value: name" name="name" type="text">
+			<label for="name">Name: </label><input data-bind="value: name" type="text">
+			<br><h3>Stat Priority: </h3>
+			<ul data-bind="foreach: statpriority">
+				<li>
+					<span data-bind="text: $data"></span>
+					<button data-bind="event: {click: $parent.movePriorityUp}">&uarr;</button>
+					<button data-bind="event: {click: $parent.movePriorityDown}">&darr;</button>
+					<button data-bind="event: {click: $parent.removePriority}">X</button>
+				</li>
+			</ul>
+			<br><h3>Secondary Stats: </h3>
+			<ul data-bind="foreach: secondaries">
+				<li>
+					<span data-bind="text: stat"></span>
+					<input class="small" data-bind="value: min" type="text">
+					<input class="small" data-bind="value: max" type="text">
+					<button data-bind="event: {click: removeSecondary}">X</button>
+				</li>
+			</ul>			
 		</div>
 	</div>
 

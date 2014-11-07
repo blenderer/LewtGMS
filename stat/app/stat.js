@@ -48,7 +48,7 @@ require([
 			//Gets bound to an anchor tag for download the saved DB
 			self.saveLink = ko.observable();
 
-			self.changeSelected = function() {
+			self.changeSelectedStat = function() {
 				for (var i=0; i<self.stats().length; i++) {
 					self.stats()[i].selected(false);
 				}
@@ -68,7 +68,7 @@ require([
 					"selected": ko.observable(false)
 				});
 				self.selectedStat(newId);
-				self.changeSelected();
+				self.changeSelectedStat();
 			}
 
 			self.removeSelectedStat = function() {

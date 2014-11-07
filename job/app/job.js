@@ -1,10 +1,9 @@
 require([
 	'knockout',
 	'komapping',
-	'kosortable',
 	'underscore',
 	'lewtgms.common'
-	], function (ko, komapping, kosort, _, common) {
+	], function (ko, komapping, _, common) {
 
 		var uploader = document.querySelector("#fileupload input");
 		//When we add a file to the uploader, do the following
@@ -16,7 +15,8 @@ require([
 		        //Make our viewmodel global, so we can easily debug in chrome
 		        //viewModel = viewModel(JSON.parse(r.result));
 		        //Then apply the binding
-		        ko.applyBindings(viewModel(JSON.parse(r.result), formElement));
+
+		        ko.applyBindings(viewModel(JSON.parse(r.result)), formElement);
 		        formElement.style.display = "block";
 		        uploader.style.display = "none";
 		    }
@@ -26,46 +26,84 @@ require([
 		uploader.addEventListener('change', initInterface);
 
 		viewModel = function(data) {
+			//map the original properties so we dont add in unecessary IDs and selected stuff
+			data.originalProps = common.getPropertyMap(data);
 
-			for (var i=0; i<data.jobs.length; i++) {
-				data.jobs[i].selected = false;
-			}
+			//originalProps doesn't need to be observable
+			var options = {
+				"copy": ["originalProps"]
+			};
 
-			data.jobs[0].selected = true;
+			//bind the data to the viewmodel
+			var self = komapping.fromJS(data, options);
 
-			var self = komapping.fromJS(data);
+			//Add in some observables to help us order and select things on the UI
+			for (var i=0; i<self.jobs().length; i++) {
+				self.jobs()[i].selected = ko.observable(false)
+				self.jobs()[i].id = ko.observable(i);
 
-			self.baseFields = ["short", "long", "base"];
+				self.jobs()[i].removePriority = function() {
 
-			self.originalProps = function(){ return _.map(ko.toJS(self).jobs, function(stat) {
-				var returnSet = {};
-
-				for (var i=0; i<self.baseFields.length; i++) {
-					var property = self.baseFields[i]
-					returnSet[property] = stat[property];
 				}
 
-				return returnSet;
-			})};
+				self.jobs()[i].movePriorityUp = function() {
 
+				}
+
+				self.jobs()[i].movePriorityDown = function() {
+
+				}
+
+				for (var secondary=0; secondary<self.jobs()[i].secondaries().length; secondary++) {
+					self.jobs()[i].secondaries()[secondary].removeSecondary = function() {
+						
+					}
+				}
+			}
+			self.jobs()[0].selected(true);
 			self.selectedJob = ko.observable("");
 
 			//Gets bound to an anchor tag for download the saved DB
 			self.saveLink = ko.observable();
 
-			self.changeSelected = function() {
-				for (var i=0; i<data.jobs.length; i++) {
+			self.changeSelectedJob = function() {
+				for (var i=0; i<self.jobs().length; i++) {
 					self.jobs()[i].selected(false);
 				}
-				_.find(self.jobs(), function(stat) {
-					return stat.name() == self.selectedJob();
-				}).selected(true);
+
+				_.find(self.jobs(), function(job) {
+					return job.id() == self.selectedJob()
+				}).selected(true)
+			}
+
+			self.newJob = function() {
+				var newId = self.jobs().length + 1;
+				self.stats.push({
+					"name": ko.observable("{Enter Name}"),
+					"id": ko.observable(newId),
+					"statpriorities": ko.observableArray(),
+					"secondaries": ko.observableArray()
+				});
+				self.selectedJob(newId);
+				self.changeSelectedJob();
+			}
+
+			self.removeSelectedJob = function() {
+				self.jobs.remove(_.find(self.jobs(), function(job) {
+					return job.selected()
+				}));
 			}
 
 			self.save = function() {
 				//File creation magic
-				var blob = new Blob([JSON.stringify({"jobs": self.originalProps()}, null, '    ')], {type: "application/octet-stream"});
+				var originalProps = self.originalProps;
+				delete self.originalProps;
+				var removed = common.removeAppSpecificProperties(komapping.toJS(self), originalProps);
+
+				var blob = new Blob([JSON.stringify(removed, null, '    ')], {type: "application/octet-stream"});
 	        	self.saveLink(window.URL.createObjectURL(blob));
+
+	        	self.originalProps = originalProps;
 			}
 
 			return self;
