@@ -53,9 +53,32 @@ require([
 		}
 
 		self.removeSelectedStat = function() {
-			self.stats.remove(_.find(self.stats(), function(stat) {
-				return stat.selected()
-			}));
+			var result = confirm("Deleting this will remove all references to the stat in Jobs. Are you sure?");
+
+			if (result) {
+				var selectedStat = _.find(self.stats(), function(stat) {
+					return stat.selected()
+				});
+
+				self.stats.remove(selectedStat);
+
+				_.each(self.jobs(), function(job) {
+					if (selectedStat.base()) {
+						_.each(job.statpriority(), function(stat) {
+							if (stat == selectedStat.short()) {
+								job.statpriority.remove(stat);
+							}
+						})
+					}
+					else {
+						_.each(job.secondaries(), function(stat) {
+							if (stat.stat() == selectedStat.short()) {
+								job.secondaries.remove(stat);
+							}
+						});
+					}
+				});
+			}
 		}
 
 		self.save = function() {
