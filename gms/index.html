@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Lewt Stat Generator</title>
+	<link rel="stylesheet" href="../base.css">
+	<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="fileupload">
+	<input type="file">
+</div>
+
+<div id="form">
+	<div data-bind="visible: currentView('stats')">
+		<select data-bind="
+						value: statsVm.selectedStat,
+						options: stats,
+						optionsText: 'long',
+						optionsValue: 'id',
+						event: {change: statsVm.changeSelectedStat}"></select><button data-bind="event: {click: statsVm.removeSelectedStat}">X</button><button data-bind="event: {click: statsVm.addNew}">Add New</button>
+
+		<div data-bind="foreach: stats">
+			<div data-bind="visible: selected">
+				<label for="short">Short Name: </label><input data-bind="value: short" class="small" type="text">
+				<br><label for="long">Long Name: </label><input data-bind="value: long" type="text">
+				<br><br>
+				<label>Base: <input data-bind="checked: base" type="checkbox" value="base"></label>
+			</div>
+		</div>
+	</div>
+	
+
+	<button data-bind="event {click: save}">Save</button><br>
+	<a data-bind="visible: saveLink, attr: {href: saveLink, download: 'data.json'}">Right Click to download</a>
+</div>
+
+<script data-main="app/app" src="../lib/require.js"></script>
+
+</body>
+</html>
