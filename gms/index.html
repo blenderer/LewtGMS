@@ -13,6 +13,7 @@
 </div>
 
 <div id="form">
+	<!--STATS VIEW-->
 	<div data-bind="visible: currentView('stats')">
 		<select data-bind="
 						value: statsVm.selectedStat,
@@ -30,6 +31,24 @@
 			</div>
 		</div>
 	</div>
+	<!--END STATS VIEW-->
+
+	<!--JOBS VIEW-->
+	<div data-bind="visible: currentView('jobs')">
+		<select name="job" data-bind="
+					value: jobsVm.selectedJob,
+					options: jobs,
+					optionsText: 'name',
+					optionsValue: 'id',
+					event: {change: jobsVm.changeSelectedJob}"></select><button data-bind="event: {click: jobsVm.removeSelectedJob}">X</button>
+
+		<div data-bind="foreach: jobs">
+			<div data-bind="visible: selected">
+				<span data-bind="text: name"></span>
+			</div>
+		</div>
+	</div>
+	<!--END JOBS VIEW-->
 	
 
 	<button data-bind="event {click: save}">Save</button><br>

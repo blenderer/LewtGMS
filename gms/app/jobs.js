@@ -1,45 +1,36 @@
-require([
+define([
     'knockout',
     'komapping',
     'underscore',
     'lewtgms.common',
-    'lewtgms.job.structure'
-    ], function (ko, komapping, _, common, structure) {
+    'lewtgms.job.structure',
+    'lewtgms.contentcollection'
+    ], function (ko, komapping, _, common, structure, Collection) {
 
-    viewModel = function(data) {
-        //map the original properties so we dont add in unecessary IDs and selected stuff
-        data.originalProps = common.getPropertyMap(data);
+    var self = {}
 
-        //originalProps doesn't need to be observable
-        var options = {
-            "copy": ["originalProps"]
-        };
+    self.init = function(jobList) {
+        var i = 0;
+        var idCallback = function(){return i++;};
 
-        //bind the data to the viewmodel
-        var self = komapping.fromJS(data, options);
+        self = new Collection("jobs", structure, jobList, [idCallback]);
+        self.vm = {};
 
-        //Add in some observables to help us order and select things on the UI
-        for (var i=0; i<self.jobs().length; i++) {
-            self.jobs()[i].selected = ko.observable(false)
-            self.jobs()[i].id = ko.observable(i);
-        }
-        self.jobs()[0].selected(true);
-        self.selectedJob = ko.observable("");
+        self.vm.changeSelectedJob = function() {
+            _.each(self.collection(), function(job) {
+                job.selected(false);
+            })
 
-        //Gets bound to an anchor tag for download the saved DB
-        self.saveLink = ko.observable();
-
-        self.changeSelectedJob = function() {
-            for (var i=0; i<self.jobs().length; i++) {
-                if (self.jobs()[i].id() == self.selectedJob()) {
-                    self.jobs()[i].selected(true);
-                }
-                else {
-                    self.jobs()[i].selected(false);
-                }
+            var toSelect = _.find(self.collection(), function(job) {
+                return job.id() == self.vm.selectedJob()
+            });
+            if (toSelect) {
+                toSelect.selected(true);
             }
         }
 
+        self.vm.selectedJob = ko.observable(0);
+        /*
         self.getSelectedJob = function() {
             return _.find(self.jobs(), function(job) { return job.selected()});
         }
@@ -54,13 +45,13 @@ require([
                 "selected": ko.observable(false)
             });
         }
-
-        self.removeSelectedJob = function() {
+        */
+        self.vm.removeSelectedJob = function() {
             self.jobs.remove(_.find(self.jobs(), function(job) {
                 return job.selected()
             }));
         }
-
+        /*
         self.addPriority = function(stat) {
             var selectedJob = self.getSelectedJob();
             selectedJob.statpriority.push(stat);
@@ -167,22 +158,12 @@ require([
             var secondaries = selectedJob.secondaries;
             secondaries.remove(secondary);
         }
+        */
 
-        self.save = function() {
-            //File creation magic
-            var originalProps = self.originalProps;
-            delete self.originalProps;
-            var removed = common.removeAppSpecificProperties(komapping.toJS(self), originalProps);
-
-            var blob = new Blob([JSON.stringify(removed, null, '    ')], {type: "application/octet-stream"});
-            self.saveLink(window.URL.createObjectURL(blob));
-
-            self.originalProps = originalProps;
-        }
+        self.collection()[0].selected(true);
 
         return self;
     }
 
-    //Attach the viewModel to the form and intiate it on fileupload
-    common.uploaderTie("#fileupload input", viewModel, "#form");
+    return self;
 });
