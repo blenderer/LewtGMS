@@ -29,7 +29,7 @@ define([
         }
         
         self.vm.addNew = function() {
-            var newItem = self.newItemFromStructure([self.findNewId]);
+            var newItem = self.newItemForApp([self.findNewId]);
 
             var newId = newItem.id();
 
