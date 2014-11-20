@@ -20,6 +20,13 @@ define([
 
         self.stats = jobList.stats;
 
+        self.vm.selectedJob = ko.observable(0);
+
+
+        self.getSelectedJob = function() {
+            return _.find(self.collection(), function(job) { return job.selected()});
+        }
+
         self.vm.changeSelectedJob = function() {
             _.each(self.collection(), function(job) {
                 job.selected(false);
@@ -33,7 +40,7 @@ define([
             }
         }
 
-        self.vm.selectedJob = ko.observable(0);
+        self.vm.changeSelectedJob();
 
         self.vm.newJob = function() {
             var newItem = self.newItemForApp([self.findNewId]);
@@ -99,33 +106,19 @@ define([
             return indexed[short].long;
         }
 
-        /*
-        self.addPriority = function(stat) {
-            var selectedJob = self.getSelectedJob();
-            selectedJob.statpriority.push(stat);
-        }
-
-        self.addSecondary = function(stat) {
-            var selectedJob = self.getSelectedJob();
-            
-            selectedJob.secondaries.push(
-                {
-                    "stat": _.find(self.getSecondaryStats(), function(vanillaStat) {
-                        return vanillaStat.short() == stat;
-                    }).short,
-                    "min": 0,
-                    "max": 0
-                }
-            );
-        }
-
-        self.removePriority = function(stat) {
+        self.vm.removePriority = function(stat) {
             var selectedJob = self.getSelectedJob();
             var statP = selectedJob.statpriority;
             statP.remove(stat);
         }
 
-        self.movePriorityUp = function(stat) {
+        self.vm.removeSecondary = function(secondary) {
+            var selectedJob = self.getSelectedJob();
+            var secondaries = selectedJob.secondaries;
+            secondaries.remove(secondary);
+        }
+
+        self.vm.movePriorityUp = function(stat) {
             var selectedJob = self.getSelectedJob();
             var statP = selectedJob.statpriority;
             var triggeredStatArrayIndex = statP.indexOf(stat);
@@ -140,7 +133,7 @@ define([
             statP = statP.splice(newPos, 0, stat);
         }
 
-        self.movePriorityDown = function(stat) {
+        self.vm.movePriorityDown = function(stat) {
             var selectedJob = self.getSelectedJob();
             var statP = selectedJob.statpriority;
             var triggeredStatArrayIndex = statP.indexOf(stat);
@@ -155,29 +148,50 @@ define([
             statP = statP.splice(newPos, 0, stat);
         }
 
+        self.vm.addPriority = function(stat) {
+            var selectedJob = self.getSelectedJob();
+            selectedJob.statpriority.push({"short": ko.observable(stat)});
+        }
+
         self.getBaseStats = function() {
-            return _.filter(self.stats(), function(stat) {
+            return _.filter(self.stats, function(stat) {
                 return stat.base()
             });
         }
 
+        self.vm.addSecondary = function(stat) {
+            var selectedJob = self.getSelectedJob();
+            
+            selectedJob.secondaries.push(
+                {
+                    "stat": _.find(self.getSecondaryStats(), function(vanillaStat) {
+                        return vanillaStat.short() == stat;
+                    }).short,
+                    "min": 0,
+                    "max": 0
+                }
+            );
+        }
+
         self.getSecondaryStats = function() {
-            return _.filter(self.stats(), function(stat) {
+            return _.filter(self.stats, function(stat) {
                 return !stat.base()
             });
         }
 
-        self.notPriorityList = ko.computed(function() {
+        self.vm.notPriorityList = ko.computed(function() {
             var selectedJob = self.getSelectedJob();
             var statP = selectedJob.statpriority;
 
             var baseStatList = _.map(komapping.toJS(self.getBaseStats()), function(stat){return stat.short});
-            var statPList = komapping.toJS(statP);
+            var statPList = _.map(komapping.toJS(statP), function(stat) {
+                                return stat.short;
+                            });
 
             return ko.observableArray(_.difference(baseStatList, statPList));
         }).extend({throttle: 50});
 
-        self.notSecondaryList = ko.computed(function() {
+        self.vm.notSecondaryList = ko.computed(function() {
             var selectedJob = self.getSelectedJob();
             var secondaries = komapping.toJS(selectedJob.secondaries());
 
@@ -186,13 +200,6 @@ define([
 
             return ko.observableArray(_.difference(secondaryStatList, alreadySecondaries));
         }).extend({throttle: 50});
-
-        self.removeSecondary = function(secondary) {
-            var selectedJob = self.getSelectedJob();
-            var secondaries = selectedJob.secondaries;
-            secondaries.remove(secondary);
-        }
-        */
 
         self.collection()[0].selected(true);
 
