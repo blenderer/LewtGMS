@@ -24,7 +24,7 @@ define([
 		}
 
 		//Stats stuff - '0'
-		var statsCollection = statCollection.init(data.stats);;
+		var statsCollection = statCollection.init(data);;
 		self.stats = statsCollection.collection;
 		self.statsVm = statsCollection.vm;
 		collectionList.push(statsCollection);
@@ -36,7 +36,10 @@ define([
 		self.jobsVm = jobsCollection.vm;
 		collectionList.push(jobsCollection);
 		self.views.push("jobs");
+
+
 		jobsCollection.stats = self.stats();
+		statsCollection.jobs = self.jobs();
 
 		//start off viewing the stats view
 		self.selectedView = ko.observable(0);

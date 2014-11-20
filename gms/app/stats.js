@@ -13,8 +13,10 @@ define([
         var i = 0;
         var idCallback = function(){return i++;};
 
-        var self = new Collection("stats", structure, statList, [idCallback]);
+        var self = new Collection("stats", structure, statList.stats, [idCallback]);
         self.vm = {};
+
+        self.jobs = statList.jobs;
 
         self.findNewId = function() {
             var idsArray = _.map(self.getCollection(), function(stat) {
@@ -60,6 +62,38 @@ define([
             });
 
             self.collection.remove(selectedStat);
+
+            //below we setup for removing references in the jobs data
+
+            //get the observable arrays for all the priorities and secondaries
+            var priorityListListObservables = _.map(self.jobs, function(job) {
+                return job.statpriority;
+            });
+            var secondaryListListObservables = _.map(self.jobs, function(job) {
+                return job.secondaries;
+            });
+            
+            //for each priority on each job, remove any references to the removed stat
+            _.each(priorityListListObservables, function(pList) {
+                var anyMatch = _.filter(pList(), function(priority) {
+                    return priority.short() == selectedStat.short()
+                });
+
+                _.each(anyMatch, function(priority) {
+                    pList.remove(priority);
+                });
+            });
+
+            //same for secondaries
+            _.each(secondaryListListObservables, function(sList) {
+                var anyMatch = _.filter(sList(), function(secondary) {
+                    return secondary.stat() == selectedStat.short()
+                });
+
+                _.each(anyMatch, function(secondary) {
+                    sList.remove(secondary);
+                });
+            });
         };
 
         self.collection()[0].selected(true);
