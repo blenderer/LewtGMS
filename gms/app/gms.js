@@ -36,6 +36,7 @@ define([
 		self.jobsVm = jobsCollection.vm;
 		collectionList.push(jobsCollection);
 		self.views.push("jobs");
+		jobsCollection.stats = self.stats();
 
 		//start off viewing the stats view
 		self.selectedView = ko.observable(0);
