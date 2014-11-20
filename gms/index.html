@@ -80,7 +80,11 @@
 		</div>
 	</div>
 	<!--END JOBS VIEW-->
-	
+	<!--CHARACTER VIEW-->
+	<div data-bind="visible: currentView('characters')">
+
+	</div>
+	<!--END CHARACTER VIEW-->	
 
 	<button data-bind="event {click: save}">Save</button><br>
 	<a data-bind="visible: saveLink, attr: {href: saveLink, download: 'data.json'}">Right Click to download</a>

@@ -4,8 +4,9 @@ define([
 	'underscore',
 	'lewtgms.common',
 	'app/stats',
-	'app/jobs'
-	], function (ko, komapping, _, common, statCollection, jobCollection) {
+	'app/jobs',
+	'app/characters'
+	], function (ko, komapping, _, common, statCollection, jobCollection, characterCollection) {
 
 	var viewModel = function(data) {
 		var self = {};
@@ -23,19 +24,26 @@ define([
 			self.selectedView(indexOfClicked);
 		}
 
-		//Stats stuff - '0'
+		//Stats stuff
 		var statsCollection = statCollection.init(data);;
 		self.stats = statsCollection.collection;
 		self.statsVm = statsCollection.vm;
 		collectionList.push(statsCollection);
 		self.views.push("stats");
 
-		//Jobs stuff - '0'
+		//Jobs stuff
 		var jobsCollection = jobCollection.init(data);;
 		self.jobs = jobsCollection.collection;
 		self.jobsVm = jobsCollection.vm;
 		collectionList.push(jobsCollection);
 		self.views.push("jobs");
+
+		//Jobs stuff
+		var charactersCollection = characterCollection.init(data);;
+		self.characters = charactersCollection.collection;
+		self.charactersVm = charactersCollection.vm;
+		collectionList.push(charactersCollection);
+		self.views.push("characters");
 
 
 		jobsCollection.stats = self.stats();
