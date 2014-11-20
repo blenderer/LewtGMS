@@ -17,6 +17,12 @@ define([
 			return viewString == self.views()[self.selectedView()];
 		}
 
+		self.changeSelectedView = function(viewString) {
+			var indexOfClicked = self.views.indexOf(viewString);
+
+			self.selectedView(indexOfClicked);
+		}
+
 		//Stats stuff - '0'
 		var statsCollection = statCollection.init(data.stats);;
 		self.stats = statsCollection.collection;

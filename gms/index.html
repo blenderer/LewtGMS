@@ -13,6 +13,12 @@
 </div>
 
 <div id="form">
+	<ul data-bind="foreach: views">
+		<li><a data-bind="text: $data,
+						  event: {click: $root.changeSelectedView},
+						  attr: {href: '#'}"></a></li>
+	</ul>
+
 	<!--STATS VIEW-->
 	<div data-bind="visible: currentView('stats')">
 		<select data-bind="
