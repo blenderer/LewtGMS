@@ -31,7 +31,7 @@ define([
 		self.views.push("stats");
 
 		//Jobs stuff - '0'
-		var jobsCollection = jobCollection.init(data.jobs);;
+		var jobsCollection = jobCollection.init(data);;
 		self.jobs = jobsCollection.collection;
 		self.jobsVm = jobsCollection.vm;
 		collectionList.push(jobsCollection);

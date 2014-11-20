@@ -47,10 +47,35 @@
 					optionsText: 'name',
 					optionsValue: 'id',
 					event: {change: jobsVm.changeSelectedJob}"></select><button data-bind="event: {click: jobsVm.removeSelectedJob}">X</button>
+					<button data-bind="event: {click: jobsVm.newJob}">Add New</button>
 
 		<div data-bind="foreach: jobs">
 			<div data-bind="visible: selected">
-				<span data-bind="text: name"></span>
+				<label for="name">Name: </label><input data-bind="value: name" type="text">
+				<br><h3>Stat Priority: </h3>
+				<ol data-bind="foreach: statpriority">
+					<li>
+						<span data-bind="text: $root.jobsVm.mapStatName($data)"></span>
+						<!--<button data-bind="event: {click: $root.movePriorityUp}">&uarr;</button>
+						<button data-bind="event: {click: $root.movePriorityDown}">&darr;</button>
+						<button data-bind="event: {click: $root.removePriority}">X</button>-->
+					</li>
+				</ol><!--
+				<div data-bind="foreach: $parent.notPriorityList()">
+					<button data-bind="text: $root.mapStatName($data), event: {click: $root.addPriority}"></button>
+				</div>	
+				<br><h3>Secondary Stats: </h3>
+				<ul data-bind="foreach: secondaries">
+					<li>
+						<span data-bind="text: $root.mapStatName(stat)"></span>
+						<input class="small" data-bind="value: min" type="text">
+						<input class="small" data-bind="value: max" type="text">
+						<button data-bind="event: {click: $root.removeSecondary}">X</button>
+					</li>
+				</ul>
+				<div data-bind="foreach: $parent.notSecondaryList()">
+					<button data-bind="text: $root.mapStatName($data), event: {click: $root.addSecondary}"></button>
+				</div>-->
 			</div>
 		</div>
 	</div>

@@ -9,12 +9,16 @@ define([
 
     var self = {}
 
+    self.stats = [];
+
     self.init = function(jobList) {
         var i = 0;
         var idCallback = function(){return i++;};
 
-        self = new Collection("jobs", structure, jobList, [idCallback]);
+        self = new Collection("jobs", structure, jobList.jobs, [idCallback]);
         self.vm = {};
+
+        self.stats = jobList.stats;
 
         self.vm.changeSelectedJob = function() {
             _.each(self.collection(), function(job) {
@@ -30,27 +34,71 @@ define([
         }
 
         self.vm.selectedJob = ko.observable(0);
-        /*
-        self.getSelectedJob = function() {
-            return _.find(self.jobs(), function(job) { return job.selected()});
+
+        self.vm.newJob = function() {
+            var newItem = self.newItemForApp([self.findNewId]);
+
+            var newId = newItem.id();
+
+            self.collection.push(newItem);
+
+            self.vm.selectedJob(newId);
+            self.vm.changeSelectedJob();
         }
 
-        self.newJob = function() {
-            var newId = self.jobs().length + 1;
-            self.jobs.push({
-                "name": ko.observable("{Enter Name}"),
-                "id": ko.observable(newId),
-                "statpriority": ko.observableArray(),
-                "secondaries": ko.observableArray(),
-                "selected": ko.observable(false)
+        self.vm.changeSelectedJob = function() {
+            _.each(self.collection(), function(job) {
+                job.selected(false);
+            })
+
+            var toSelect = _.find(self.collection(), function(job) {
+                return job.id() == self.vm.selectedJob()
             });
+            if (toSelect) {
+                toSelect.selected(true);
+            }
+        };
+
+        self.findNewId = function() {
+            var idsArray = _.map(self.getCollection(), function(stat) {
+                return stat.id;
+            });
+
+            if (idsArray.length == 0) {
+                return 0;
+            }
+
+            return common.getHighestNumber(idsArray) + 1;
         }
-        */
+        
         self.vm.removeSelectedJob = function() {
-            self.jobs.remove(_.find(self.jobs(), function(job) {
+            self.collection.remove(_.find(self.collection(), function(job) {
                 return job.selected()
             }));
         }
+
+        self.vm.mapStatName = function(short) {
+            if (_.isFunction(short)) {
+                short = short();
+            }
+
+            if (short.hasOwnProperty("short")) {
+                short = short.short();
+            }
+            else if (short.hasOwnProperty("stat")) {
+                short = short.stat();
+            }
+
+            var stats = komapping.toJS(self.stats);
+            var indexed = _.indexBy(stats, 'short');
+
+            if (!indexed[short]) {
+                return short;
+            }
+
+            return indexed[short].long;
+        }
+
         /*
         self.addPriority = function(stat) {
             var selectedJob = self.getSelectedJob();
@@ -117,20 +165,6 @@ define([
             return _.filter(self.stats(), function(stat) {
                 return !stat.base()
             });
-        }
-
-        self.mapStatName = function(short) {
-            if (_.isFunction(short)) {
-                short = short();
-            }
-            var stats = ko.toJS(self.stats());
-            var indexed = _.indexBy(stats, 'short');
-
-            if (!indexed[short]) {
-                return short;
-            }
-
-            return indexed[short].long;
         }
 
         self.notPriorityList = ko.computed(function() {
