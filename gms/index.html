@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
-	<title>Lewt Stat Generator</title>
+	<title>Lewt Game Content Manager</title>
 	<link rel="stylesheet" href="../base.css">
 	<link rel="stylesheet" href="style.css">
 </head>
@@ -13,7 +13,7 @@
 </div>
 
 <div id="form">
-	<ul data-bind="foreach: views">
+	<ul id="nav" data-bind="foreach: views">
 		<li><a data-bind="text: $data,
 						  event: {click: $root.changeSelectedView},
 						  attr: {href: '#'}"></a></li>
