@@ -82,7 +82,36 @@
 	<!--END JOBS VIEW-->
 	<!--CHARACTER VIEW-->
 	<div data-bind="visible: currentView('characters')">
+		<select name="job" data-bind="
+					value: charactersVm.selectedCharacter,
+					options: characters,
+					optionsText: 'name',
+					optionsValue: 'id',
+					event: {change: charactersVm.changeSelectedCharacter}"></select>
+		<button data-bind="event: {click: charactersVm.removeSelectedCharacter}">X</button>
+		<button data-bind="event: {click: charactersVm.newCharacter}">New Character</button>
 
+		<div data-bind="foreach: characters">
+			<div data-bind="visible: selected">
+			<label for="name">Name: </label><input data-bind="value: name" type="text"><br>
+
+			<label for="name">Job: </label>
+			<select name="job" data-bind="
+					value: job,
+					options: $root.jobs,
+					optionsText: 'name',
+					optionsValue: 'name'"></select>
+			<button data-bind="event: {click: $root.charactersVm.roll}">Roll / Reroll</button>
+			<br><h3>Stats: </h3>
+			<ul data-bind="foreach: stats">
+				<li><span data-bind="text: stat" class="job-statname"></span><input class="small" data-bind="value: current" type="text"><input class="small" data-bind="value: max" type="text"></li>
+			</ul>
+			<h3>Items: </h3>
+				<ul data-bind="foreach: items">
+					<li data-bind="text: item"></li>
+				</ul>
+			</div>
+		</div>
 	</div>
 	<!--END CHARACTER VIEW-->	
 

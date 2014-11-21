@@ -49,6 +49,8 @@ define([
 		jobsCollection.stats = self.stats();
 		statsCollection.jobs = self.jobs();
 
+		charactersCollection.ref = self;
+
 		//start off viewing the stats view
 		self.selectedView = ko.observable(0);
 
