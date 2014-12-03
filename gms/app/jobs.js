@@ -9,16 +9,14 @@ define([
 
     var self = {}
 
-    self.stats = [];
-
-    self.init = function(jobList) {
+    self.init = function(data) {
         var i = 0;
         var idCallback = function(){return i++;};
 
-        self = new Collection("jobs", structure, jobList.jobs, [idCallback]);
+        self = new Collection("jobs", structure, data.jobs, [idCallback]);
         self.vm = {};
 
-        self.stats = jobList.stats;
+        self.ref = data;
 
         self.vm.selectedJob = ko.observable(0);
 
@@ -96,7 +94,7 @@ define([
                 short = short.stat();
             }
 
-            var stats = komapping.toJS(self.stats);
+            var stats = komapping.toJS(self.ref.stats());
             var indexed = _.indexBy(stats, 'short');
 
             if (!indexed[short]) {
@@ -154,7 +152,7 @@ define([
         }
 
         self.getBaseStats = function() {
-            return _.filter(self.stats, function(stat) {
+            return _.filter(self.ref.stats(), function(stat) {
                 return stat.base()
             });
         }
@@ -174,7 +172,7 @@ define([
         }
 
         self.getSecondaryStats = function() {
-            return _.filter(self.stats, function(stat) {
+            return _.filter(self.ref.stats(), function(stat) {
                 return !stat.base()
             });
         }

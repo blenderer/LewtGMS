@@ -11,6 +11,8 @@ define([
 	var viewModel = function(data) {
 		var self = {};
 
+		data = komapping.fromJS(data);
+
 		var collectionList = [];
 		self.views = ko.observableArray([]);
 
@@ -29,27 +31,26 @@ define([
 		self.stats = statsCollection.collection;
 		self.statsVm = statsCollection.vm;
 		collectionList.push(statsCollection);
-		self.views.push("stats");
 
 		//Jobs stuff
 		var jobsCollection = jobCollection.init(data);;
 		self.jobs = jobsCollection.collection;
 		self.jobsVm = jobsCollection.vm;
 		collectionList.push(jobsCollection);
-		self.views.push("jobs");
 
 		//Jobs stuff
 		var charactersCollection = characterCollection.init(data);;
 		self.characters = charactersCollection.collection;
 		self.charactersVm = charactersCollection.vm;
 		collectionList.push(charactersCollection);
-		self.views.push("characters");
 
+		_.each(collectionList, function(collection) {
+			//add this collection's name to the view list
+			self.views.push(collection.name);
 
-		jobsCollection.stats = self.stats();
-		statsCollection.jobs = self.jobs();
-
-		charactersCollection.ref = self;
+			//assign the entire viewmodel to this collection so it can access it's live changes
+			collection.ref = self;
+		});
 
 		//start off viewing the stats view
 		self.selectedView = ko.observable(0);

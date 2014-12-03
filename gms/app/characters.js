@@ -18,8 +18,6 @@ define([
         var self = new Collection("characters", structure, data.characters, [idCallback]);
         self.vm = {};
 
-        self.ref = data;
-
         self.findNewId = function() {
             var idsArray = _.map(self.getCollection(), function(character) {
                 return character.id;

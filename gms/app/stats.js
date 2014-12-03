@@ -9,14 +9,14 @@ define([
 
     var self = {};
 
-    self.init = function(statList) {
+    self.init = function(data) {
         var i = 0;
         var idCallback = function(){return i++;};
 
-        var self = new Collection("stats", structure, statList.stats, [idCallback]);
+        var self = new Collection("stats", structure, data.stats, [idCallback]);
         self.vm = {};
 
-        self.jobs = statList.jobs;
+        self.ref = data;
 
         self.findNewId = function() {
             var idsArray = _.map(self.getCollection(), function(stat) {
@@ -66,10 +66,10 @@ define([
             //below we setup for removing references in the jobs data
 
             //get the observable arrays for all the priorities and secondaries
-            var priorityListListObservables = _.map(self.jobs, function(job) {
+            var priorityListListObservables = _.map(self.ref.jobs(), function(job) {
                 return job.statpriority;
             });
-            var secondaryListListObservables = _.map(self.jobs, function(job) {
+            var secondaryListListObservables = _.map(self.ref.jobs(), function(job) {
                 return job.secondaries;
             });
             
