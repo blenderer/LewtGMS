@@ -78,6 +78,12 @@ define([
             return indexed[short].long;
         }
 
+        self.vm.getBaseStats = function() {
+            return _.filter(self.collection(), function(stat) {
+                return stat.base()
+            });
+        }
+
         self.vm.removeSelectedStat = function() {
             var selectedStat = _.find(self.collection(), function(stat) {
                 return stat.selected()

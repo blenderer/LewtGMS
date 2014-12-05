@@ -69,21 +69,27 @@ define([
         }
 
         self.vm.roll = function() {
+            //get access to jobs mapping
             var jobs = komapping.toJS(self.ref.jobs);
+            //find the job that the current character is selected
             var job = _.find(jobs, function(job) {
                 return job.name == self.currentCharacter().job();
             });
 
+            //roll 6 x 4d6, drop the lowest of the 4
             var rolls = common.rollSet("4d6", 6, true);
 
+            //just get the totals
             var rollTotals = _.pluck(rolls, "total").sort(common.numSort).reverse();
 
+            //get the current job's statpriority
             var priorities = job.statpriority;
-            
+            //shuffle the base stats so we can assign them randomly later
+            var priorityStack = _.shuffle(_.pluck(komapping.toJS(self.ref.statsVm.getBaseStats()), "short"));
+
+            //assign our best rolls in order to the stat priority
             _.each(priorities, function(mainStat) {
-                self.currentCharacter().stats.remove(_.find(self.currentCharacter().stats(), function(stat) {
-                    return stat.stat() == mainStat.short;
-                }));
+                self.removeStatIfExists(mainStat.short);
 
                 self.currentCharacter().stats.push({
                     "stat": ko.observable(mainStat.short),
@@ -91,8 +97,58 @@ define([
                     "current": ko.observable(rollTotals[0])
                 });
                 
+                priorityStack.splice(priorityStack.indexOf(mainStat.short), 1);
                 rollTotals = rollTotals.slice(1);
             });
+
+            //now fill the remaining stats with the not-so-good rolls
+            while (priorityStack.length > 0) {
+                self.removeStatIfExists(priorityStack[0]);
+
+                self.currentCharacter().stats.push({
+                    "stat": ko.observable(priorityStack[0]),
+                    "max": ko.observable(rollTotals[0]),
+                    "current": ko.observable(rollTotals[0])
+                });
+                rollTotals = rollTotals.slice(1);
+                priorityStack = priorityStack.slice(1);
+            }
+
+            //Lets give the character a class-specific hp according to the hitdie
+            self.removeStatIfExists("hd");
+            self.removeStatIfExists("hp");
+            
+            var hitDieStat = _.find(job.secondaries, function(stat) {
+                return stat.stat == "hd";
+            });
+            var hitDie = common.getRandomInt(hitDieStat.min, hitDieStat.max);
+
+            self.currentCharacter().stats.push({
+                "stat": ko.observable("hd"),
+                "max": ko.observable(hitDie),
+                "current": ko.observable(hitDie)
+            });
+
+            var newHp = hitDie + self.vm.getAbilityModifier("con");
+
+            self.currentCharacter().stats.push({
+                "stat": ko.observable("hp"),
+                "max": ko.observable(newHp),
+                "current": ko.observable(newHp)
+            });
+        }
+
+        self.vm.getAbilityModifier = function(statShort) {
+            var indexed = _.indexBy(komapping.toJS(self.currentCharacter().stats()), 'stat');
+            var abilityScore = indexed[statShort].current;
+
+            return Math.floor((abilityScore - 10) / 2)
+        }
+
+        self.removeStatIfExists = function(short) {
+            self.currentCharacter().stats.remove(_.find(self.currentCharacter().stats(), function(stat) {
+                return stat.stat() == short;
+            }));
         }
 
         self.collection()[0].selected(true);
