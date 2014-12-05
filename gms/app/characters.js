@@ -69,12 +69,30 @@ define([
         }
 
         self.vm.roll = function() {
-            var job = _.find(self.ref.jobs(), function(job) {
-                return job.name() == self.currentCharacter().job();
+            var jobs = komapping.toJS(self.ref.jobs);
+            var job = _.find(jobs, function(job) {
+                return job.name == self.currentCharacter().job();
             });
 
-            var priorities = job.statpriority();
+            var rolls = common.rollSet("4d6", 6, true);
+
+            var rollTotals = _.pluck(rolls, "total").sort(common.numSort).reverse();
+
+            var priorities = job.statpriority;
             
+            _.each(priorities, function(mainStat) {
+                self.currentCharacter().stats.remove(_.find(self.currentCharacter().stats(), function(stat) {
+                    return stat.stat() == mainStat.short;
+                }));
+
+                self.currentCharacter().stats.push({
+                    "stat": ko.observable(mainStat.short),
+                    "max": ko.observable(rollTotals[0]),
+                    "current": ko.observable(rollTotals[0])
+                });
+                
+                rollTotals = rollTotals.slice(1);
+            });
         }
 
         self.collection()[0].selected(true);
