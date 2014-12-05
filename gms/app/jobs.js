@@ -90,28 +90,6 @@ define([
             }));
         }
 
-        self.vm.mapStatName = function(short) {
-            if (_.isFunction(short)) {
-                short = short();
-            }
-
-            if (short.hasOwnProperty("short")) {
-                short = short.short();
-            }
-            else if (short.hasOwnProperty("stat")) {
-                short = short.stat();
-            }
-
-            var stats = komapping.toJS(self.ref.stats());
-            var indexed = _.indexBy(stats, 'short');
-
-            if (!indexed[short]) {
-                return short;
-            }
-
-            return indexed[short].long;
-        }
-
         self.vm.removePriority = function(stat) {
             var selectedJob = self.getSelectedJob();
             var statP = selectedJob.statpriority;

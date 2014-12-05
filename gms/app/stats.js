@@ -56,6 +56,28 @@ define([
             }
         };
 
+        self.vm.mapStatName = function(short) {
+            if (_.isFunction(short)) {
+                short = short();
+            }
+
+            if (short.hasOwnProperty("short")) {
+                short = short.short();
+            }
+            else if (short.hasOwnProperty("stat")) {
+                short = short.stat();
+            }
+
+            var stats = komapping.toJS(self.collection());
+            var indexed = _.indexBy(stats, 'short');
+
+            if (!indexed[short]) {
+                return short;
+            }
+
+            return indexed[short].long;
+        }
+
         self.vm.removeSelectedStat = function() {
             var selectedStat = _.find(self.collection(), function(stat) {
                 return stat.selected()
