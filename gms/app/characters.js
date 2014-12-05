@@ -58,8 +58,8 @@ define([
 
             self.collection.push(newItem);
 
-            // self.vm.selectedJob(newId);
-            // self.vm.changeSelectedJob();
+            self.vm.selectedCharacter(newId);
+            self.vm.changeSelectedCharacter();
         }
 
         self.vm.removeSelectedCharacter = function() {
