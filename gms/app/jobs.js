@@ -43,6 +43,14 @@ define([
         self.vm.newJob = function() {
             var newItem = self.newItemForApp([self.findNewId]);
 
+            //new classes roll with a d6 hitdie
+            var newhitDie = {
+                "stat": "hd",
+                "min": 6,
+                "max": 6
+            };
+            newItem.secondaries.push(newhitDie);
+
             var newId = newItem.id();
 
             self.collection.push(newItem);
