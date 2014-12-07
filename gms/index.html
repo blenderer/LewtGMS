@@ -113,7 +113,13 @@
 			</div>
 		</div>
 	</div>
-	<!--END CHARACTER VIEW-->	
+	<!--END CHARACTER VIEW-->
+
+	<!--ITEM VIEW-->
+	<div data-bind="visible: currentView('items')">
+
+	</div>
+	<!--END ITEM VIEW-->
 
 	<button data-bind="event {click: save}">Save</button><br>
 	<a data-bind="visible: saveLink, attr: {href: saveLink, download: 'data.json'}">Right Click to download</a>

@@ -5,8 +5,9 @@ define([
 	'lewtgms.common',
 	'app/stats',
 	'app/jobs',
-	'app/characters'
-	], function (ko, komapping, _, common, statCollection, jobCollection, characterCollection) {
+	'app/characters',
+	'app/items'
+	], function (ko, komapping, _, common, statCollection, jobCollection, characterCollection, itemCollection) {
 
 	var viewModel = function(data) {
 		var self = {};
@@ -27,22 +28,28 @@ define([
 		}
 
 		//Stats stuff
-		var statsCollection = statCollection.init(data);;
+		var statsCollection = statCollection.init(data);
 		self.stats = statsCollection.collection;
 		self.statsVm = statsCollection.vm;
 		collectionList.push(statsCollection);
 
 		//Jobs stuff
-		var jobsCollection = jobCollection.init(data);;
+		var jobsCollection = jobCollection.init(data);
 		self.jobs = jobsCollection.collection;
 		self.jobsVm = jobsCollection.vm;
 		collectionList.push(jobsCollection);
 
 		//Jobs stuff
-		var charactersCollection = characterCollection.init(data);;
+		var charactersCollection = characterCollection.init(data);
 		self.characters = charactersCollection.collection;
 		self.charactersVm = charactersCollection.vm;
 		collectionList.push(charactersCollection);
+
+		//Items
+		var itemsCollection = itemCollection.init(data);
+		self.items = itemsCollection.collection;
+		self.itemsVm = itemsCollection.vm;
+		collectionList.push(itemsCollection);
 
 		_.each(collectionList, function(collection) {
 			//add this collection's name to the view list
