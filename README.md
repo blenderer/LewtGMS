@@ -1,18 +1,17 @@
 LewtGMS(Game Content Management System)
 ============
 
-Job (character classes administration)
+Single Page App that manages a all sorts of data for a little game called Lewt
 
-Knockout interface that can save to sqlite database
+**Apps:**
 
-**Features:**
-
-1. Select class to edit
-2. Reorder/remove/add stat priority
-3. Edit hitdie/classname
-4. save/reset
+1. Items
+2. Spells
+3. Stats
+4. Characters
+5. Jobs
 
 **Screenshot of interface:**
 
 ![Screenshot of app interface]
-(http://i.imgur.com/vKBy66V.png)
+(http://i.imgur.com/fpHiWxK.png)
