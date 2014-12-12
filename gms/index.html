@@ -117,6 +117,34 @@
 
 	<!--ITEM VIEW-->
 	<div data-bind="visible: currentView('items')">
+		<select name="job" data-bind="
+					value: itemsVm.selectedItem,
+					options: items,
+					optionsText: 'name',
+					optionsValue: 'id',
+					event: {change: itemsVm.changeSelectedItem}"></select>
+		<button data-bind="event: {click: itemsVm.removeSelectedItem}">X</button>
+		<button data-bind="event: {click: itemsVm.addNew}">Add New</button>
+
+		<div data-bind="foreach: items">
+			<div data-bind="visible: selected">
+				<input data-bind="value: name"></input>
+				<h4>Modifiers:</h4>
+				<button data-bind="event: {click: $root.itemsVm.addNewMod}">Add Mod</button>
+				<button data-bind="event: {click: $root.itemsVm.addNewSpell}">Add Spell</button>
+				<ul data-bind="foreach: modifiers">
+					<li>
+						<input class="small" data-bind="value: amount"></input>
+						<select class="small" data-bind="
+								value: stat,
+								options: $root.stats,
+								optionsText: 'short',
+								optionsValue: 'short'"></select>
+						<button data-bind="event: {click: $root.itemsVm.removeMod}">X</button>
+					</li>
+				</ul>
+			</div>
+		</div>
 
 	</div>
 	<!--END ITEM VIEW-->

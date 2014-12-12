@@ -29,6 +29,25 @@ define([
 
             return common.getHighestNumber(idsArray) + 1;
         }
+
+        self.getSelectedItem = function() {
+            return _.find(self.collection(), function(item) { return item.selected()});
+        }
+
+        self.vm.addNewMod = function() {
+            self.getSelectedItem().modifiers.push({
+                "stat": ko.observable("hp"),
+                "amount": ko.observable(0)
+            });
+        }
+
+        self.vm.addNewSpell = function() {
+            
+        }
+
+        self.vm.removeMod = function(modifier) {
+            self.getSelectedItem().modifiers.remove(modifier);
+        }
         
         self.vm.addNew = function() {
             var newItem = self.newItemForApp([self.findNewId]);
@@ -57,7 +76,11 @@ define([
         };
 
         self.vm.removeSelectedItem = function() {
+            var selectedItem = _.find(self.collection(), function(item) {
+                return item.selected()
+            });
 
+            self.collection.remove(selectedItem);
         };
 
         self.collection()[0].selected(true);
