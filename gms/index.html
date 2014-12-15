@@ -129,6 +129,8 @@
 		<div data-bind="foreach: items">
 			<div data-bind="visible: selected">
 				<input data-bind="value: name"></input>
+				<h4>Weapon Roll:</h4>
+				<input class="short" data-bind="value: weapon">
 				<h4>Modifiers:</h4>
 				<button data-bind="event: {click: $root.itemsVm.addNewMod}">Add Mod</button>
 				<button data-bind="event: {click: $root.itemsVm.addNewSpell}">Add Spell</button>
