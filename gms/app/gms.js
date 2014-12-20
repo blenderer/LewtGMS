@@ -6,8 +6,9 @@ define([
 	'app/stats',
 	'app/jobs',
 	'app/characters',
-	'app/items'
-	], function (ko, komapping, _, common, statCollection, jobCollection, characterCollection, itemCollection) {
+	'app/items',
+	'app/spells'
+	], function (ko, komapping, _, common, statCollection, jobCollection, characterCollection, itemCollection, spellCollection) {
 
 	var viewModel = function(data) {
 		var self = {};
@@ -50,6 +51,12 @@ define([
 		self.items = itemsCollection.collection;
 		self.itemsVm = itemsCollection.vm;
 		collectionList.push(itemsCollection);
+
+		//Spells
+		var spellsCollection = spellCollection.init(data);
+		self.spells = spellsCollection.collection;
+		self.spellsVm = spellsCollection.vm;
+		collectionList.push(spellsCollection);
 
 		_.each(collectionList, function(collection) {
 			//add this collection's name to the view list

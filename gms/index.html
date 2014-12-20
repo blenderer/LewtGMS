@@ -33,7 +33,7 @@
 				<label for="short">Short Name: </label><input data-bind="value: short" class="small" type="text">
 				<br><label for="long">Long Name: </label><input data-bind="value: long" type="text">
 				<br><br>
-				<label>Base: <input data-bind="checked: base" type="checkbox" value="base"></label>
+				<label>Base: <input data-bind="checked: base" type="checkbox"></label>
 			</div>
 		</div>
 	</div>
@@ -150,6 +150,31 @@
 
 	</div>
 	<!--END ITEM VIEW-->
+
+	<!--SPELL VIEW-->
+	<div data-bind="visible: currentView('spells')">
+		<select name="job" data-bind="
+					value: spellsVm.selectedSpell,
+					options: spells,
+					optionsText: 'name',
+					optionsValue: 'id',
+					event: {change: spellsVm.changeSelectedSpell}"></select><br>
+		<div data-bind="foreach: spells">
+			
+			<div data-bind="visible: selected">
+
+				<input data-bind="value: name"></input><br>
+				<label>Casted: <input data-bind="checked: casted" type="checkbox"></label><br>
+				<textarea data-bind="value: description"></textarea><br>
+
+				<h4>Effects:</h4>
+				<ul data-bind="foreach: effects">
+					<li data-bind="text: stat"></li>
+				</ul>
+			</div>
+		</div>
+	</div>
+	<!--END SPELL VIEW-->
 
 	<button data-bind="event {click: save}">Save</button><br>
 	<a data-bind="visible: saveLink, attr: {href: saveLink, download: 'data.json'}">Right Click to download</a>
