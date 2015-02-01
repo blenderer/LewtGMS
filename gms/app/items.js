@@ -37,12 +37,17 @@ define([
         self.vm.addNewMod = function() {
             self.getSelectedItem().modifiers.push({
                 "stat": ko.observable("hp"),
-                "amount": ko.observable(0)
+                "amount": ko.observable(0),
+                "spell": false
             });
         }
 
         self.vm.addNewSpell = function() {
-            
+            self.getSelectedItem().modifiers.push({
+                "stat": false,
+                "amount": false,
+                "spell": "Magic Missile"
+            })
         }
 
         self.vm.removeMod = function(modifier) {

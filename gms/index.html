@@ -136,13 +136,22 @@
 				<button data-bind="event: {click: $root.itemsVm.addNewSpell}">Add Spell</button>
 				<ul data-bind="foreach: modifiers">
 					<li>
-						<input class="small" data-bind="value: amount"></input>
-						<select class="small" data-bind="
-								value: stat,
-								options: $root.stats,
-								optionsText: 'short',
-								optionsValue: 'short'"></select>
-						<button data-bind="event: {click: $root.itemsVm.removeMod}">X</button>
+						<!-- ko if: stat -->
+							<input class="small" data-bind="value: amount"></input>
+							<select class="small" data-bind="
+									value: stat,
+									options: $root.stats,
+									optionsText: 'short',
+									optionsValue: 'short'"></select>
+							<button data-bind="event: {click: $root.itemsVm.removeMod}">X</button>
+						<!-- /ko -->
+						<!-- ko if: spell -->
+							<select name="job" data-bind="
+									value: spell,
+									options: $root.spells,
+									optionsText: 'name',
+									optionsValue: 'name'"></select>
+						<!-- /ko -->
 					</li>
 				</ul>
 			</div>
