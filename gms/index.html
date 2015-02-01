@@ -134,8 +134,10 @@
 					value: type,
 					options: ['armor', 'accessory', 'weapon', 'off-hand']
 					"></select>
-				<h4>Weapon Roll:</h4>
-				<input class="short" data-bind="value: weapon">
+				<div data-bind="visible: type() == 'weapon'">
+					<h4>Weapon Roll:</h4>
+					<input placeholder="dice syntax" class="short" data-bind="value: weapon">
+				</div>
 				<h4>Modifiers:</h4>
 				<button data-bind="event: {click: $root.itemsVm.addNewMod}">Add Mod</button>
 				<button data-bind="event: {click: $root.itemsVm.addNewSpell}">Add Spell</button>
