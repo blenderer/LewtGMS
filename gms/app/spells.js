@@ -60,6 +60,19 @@ define([
             }
         };
 
+        self.vm.addEffect = function() {
+            self.getSelectedSpell().effects.push({
+                "stat": "hp",
+                "target": "enemy",
+                "duration": 0,
+                "amount": -1
+            })
+        };
+
+        self.vm.removeEffect = function(effect) {
+            self.getSelectedSpell().effects.remove(effect);
+        };
+
         self.vm.removeSelectedSpell = function() {
             var selectedSpell = _.find(self.collection(), function(spell) {
                 return spell.selected()

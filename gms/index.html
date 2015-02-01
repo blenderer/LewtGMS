@@ -151,6 +151,7 @@
 									options: $root.spells,
 									optionsText: 'name',
 									optionsValue: 'name'"></select>
+							<button data-bind="event: {click: $root.itemsVm.removeMod}">X</button>
 						<!-- /ko -->
 					</li>
 				</ul>
@@ -179,8 +180,12 @@
 				<textarea data-bind="value: description"></textarea><br>
 
 				<h4>Effects:</h4>
+				<button data-bind="event: {click: $root.spellsVm.addEffect}">Add New</button>
 				<ul data-bind="foreach: effects">
-					<li data-bind="text: $index"></li>
+					<li>
+						<span data-bind="text: $index"></span>
+						<button data-bind="event: {click: $root.spellsVm.removeEffect}">X</button>
+					</li>
 					<ul>
 						<li><strong>Stat: </strong><select class="small" data-bind="
 									value: stat,

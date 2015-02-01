@@ -42,16 +42,16 @@ define([
             });
         }
 
+        self.vm.removeMod = function(modifier) {
+            self.getSelectedItem().modifiers.remove(modifier);
+        }
+
         self.vm.addNewSpell = function() {
             self.getSelectedItem().modifiers.push({
                 "stat": false,
                 "amount": false,
                 "spell": "Magic Missile"
             })
-        }
-
-        self.vm.removeMod = function(modifier) {
-            self.getSelectedItem().modifiers.remove(modifier);
         }
         
         self.vm.addNew = function() {
