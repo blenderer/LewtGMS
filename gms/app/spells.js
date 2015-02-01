@@ -33,14 +33,9 @@ define([
         self.getSelectedSpell = function() {
             return _.find(self.collection(), function(spell) { return spell.selected()});
         }
-
-        self.vm.addNewSpell = function() {
-            
-        }
-
         
         self.vm.addNew = function() {
-            var newSpell = self.newSpellForApp([self.findNewId]);
+            var newSpell = self.newItemForApp([self.findNewId]);
 
             var newId = newSpell.id();
 

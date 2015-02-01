@@ -158,7 +158,9 @@
 					options: spells,
 					optionsText: 'name',
 					optionsValue: 'id',
-					event: {change: spellsVm.changeSelectedSpell}"></select><br>
+					event: {change: spellsVm.changeSelectedSpell}"></select>
+					<button data-bind="event: {click: spellsVm.addNew}">Add New</button>
+					<br>
 		<div data-bind="foreach: spells">
 			
 			<div data-bind="visible: selected">
@@ -169,7 +171,20 @@
 
 				<h4>Effects:</h4>
 				<ul data-bind="foreach: effects">
-					<li data-bind="text: stat"></li>
+					<li data-bind="text: $index"></li>
+					<ul>
+						<li><strong>Stat: </strong><select class="small" data-bind="
+									value: stat,
+									options: $root.stats,
+									optionsText: 'short',
+									optionsValue: 'short'"></select></li>
+						<li><strong>Target: </strong><select data-bind="
+									value: target,
+									options: ['self', 'enemy', 'lowestally', 'party']
+									"></select></li>
+						<li><strong>Duration: </strong><input class="small" data-bind="value: duration"></input></li>
+						<li><strong>Amount: </strong><input  class="small" data-bind="value: amount"></input></li>
+					</ul>
 				</ul>
 			</div>
 		</div>
