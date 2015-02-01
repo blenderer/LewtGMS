@@ -129,6 +129,11 @@
 		<div data-bind="foreach: items">
 			<div data-bind="visible: selected">
 				<input data-bind="value: name"></input>
+				<h4>Type:</h4>
+				<select data-bind="
+					value: type,
+					options: ['armor', 'accessory', 'weapon', 'off-hand']
+					"></select>
 				<h4>Weapon Roll:</h4>
 				<input class="short" data-bind="value: weapon">
 				<h4>Modifiers:</h4>
